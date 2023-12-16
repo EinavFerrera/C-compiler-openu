@@ -1,7 +1,6 @@
-#include "preAssembler.h"
 #include "genericH.h"
+#include "preAssembler.h"
 
-void extractMcr(node, char **, FILE **);
 
 void fileCompiling(char* fileName) {
     // Create the output file name
@@ -24,31 +23,22 @@ void fileCompiling(char* fileName) {
         fclose(inputFile);
         return;
     }
-    extractMcr(*inputFile, *outputFile);
-)
-    // Read line by line from the input file
-    char line[MAX_LINE_SIZE];//what is the for each line?
-    while (fgets(line, sizeof(line), inputFile)) {
-        // Append "**" to the line
-        strcat(line, "**!");
+    extractMcr(inputFile, outputFile);
 
-        // Write the modified line to the output file
-        fputs(line, outputFile);
-    }
+    // // Read line by line from the input file
+    // char line[MAX_LINE_SIZE];//what is the for each line?
+    // while (fgets(line, sizeof(line), inputFile)) {
+    //     // Append "**" to the line
+    //     strcat(line, "**!");
+
+    //     // Write the modified line to the output file
+    //     fputs(line, outputFile);
+    // }
 
     // Close the files
     fclose(inputFile);
     fclose(outputFile);
 }
-void openFiles(char **fileName, FILE **originalFile, FILE **modifiedFile)
-{}
-
-/** extractMcr
- * writting the macro that declared to certain place inside am file
- * @param node - node of certain macro - the macros are stored inside linked list
- * @param fileName - the name of file as written in terminal
- * @param modified - the modified file with .am extenssion after extracting the macros
- * */
 void extractMcr(FILE *inputFile, FILE *outputFile)
 {
     char line[MAX_LINE_SIZE];//what is the for each line?

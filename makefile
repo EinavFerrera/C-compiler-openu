@@ -2,9 +2,9 @@
 
 assembler: main.o preAssembler.o
 	gcc *.c -Wall -ansi -pedantic -o assembler -lm
-main.o: main.c preAssembler.h
+main.o: main.c preAssembler.h genericH.h
 	gcc main.c -Wall -ansi -pedantic -c
-preAssembler.o: preAssembler.c preAssembler.h
+preAssembler.o: preAssembler.c preAssembler.h genericH.h
 	gcc preAssembler.c -Wall -ansi -pedantic -c
 
 clean:

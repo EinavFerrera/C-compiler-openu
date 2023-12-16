@@ -7,4 +7,6 @@
  */
 void fileCompiling(char* fileName);
 
+void extractMcr(FILE *inputFile, FILE *outputFile);
+
 #endif
