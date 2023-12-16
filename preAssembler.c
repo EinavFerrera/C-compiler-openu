@@ -45,12 +45,10 @@ void extractMcr(FILE *inputFile, FILE *outputFile)
     while (fgets(line, sizeof(line), inputFile)) {
         // Append "**" to the line
         strcat(line, "**!");
-
+    
         // Write the modified line to the output file
         fputs(line, outputFile);
-    }
-    
-    
+    }    
 }
 
 int srcMcr(char *startOfLine, bool *isMcr)
