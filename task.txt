@@ -1,0 +1,8 @@
+A. pre assembler- clear macros
+B.1. defines and labels
+B.2. node making
+B.3. node check 
+C error print
+D.1. nodes to numbers
+D.2. numbers to cypher
+D.3. ext and entry text
