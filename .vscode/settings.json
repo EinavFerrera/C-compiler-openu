@@ -1,6 +1,7 @@
 {
   "files.associations": {
     "iostream": "cpp",
-    "preassembler.h": "c"
+    "preassembler.h": "c",
+    "typeinfo": "c"
   }
 }

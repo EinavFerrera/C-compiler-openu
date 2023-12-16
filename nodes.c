@@ -1,6 +1,9 @@
-typedef struct node
+#include "genericH.h"
+#include <string.h>
+
+typedef struct Gnode
 {
-	char* originalLine;
+	char originalLine[MAX_LINE_SIZE];  /*original line from the file*/
 	int lineNum;		    /*line number in the original file*/
     int isMcr;	            /*is a macro - T\F*/
 	int startMcr;		    /*line where the macro begins*/
@@ -15,12 +18,33 @@ typedef struct node
 	char labelText[MAX_LINE_SIZE];/*original label*/
     int lineSize;	        /*number of words needed in the IC\DC*/
     int linetType;          /*type of the instruction - DATA/CODE*/
-	node next;			/*pointer to the next struct in the linked list*/
-} Item;
+	Gnode next;			    /*pointer to the next node in list*/
+} item;
 
-node createNode(char *name, int address)
+Gnode createNewNode(char *line ,int lineAdress)
 {
-	gNode newNode = (gNode)calloc(1, sizeof(Item));
+	Gnode newNode = (Gnode)calloc(1, sizeof(node));
+    strcpy(newNode->originalLine, line);  
+	newNode->lineNum = 	lineAdress;	
+     isMcr;	            
+	 startMcr;		    
+	 endMcr; 		   
+	 lableAddressLine;   
+	 operandCount;   
+	 operandType[2];    
+	 operandImm[2];	    
+     operandReg[2]; 	   
+     operandLabel[2];  
+	 ARE;			    
+	 labelText[MAX_LINE_SIZE];
+     lineSize;	      
+     linetType;        
+	node next;	
+    
+    
+    
+    
+    gNode newNode = (gNode)calloc(1, sizeof(Item));
 	newNode->name = (char *)calloc(1, (strlen(name) + 1) * sizeof(char));
 	strcpy(newNode->name, name);
 	newNode->startMacro = 0;

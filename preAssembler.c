@@ -1,4 +1,5 @@
 #include "preAssembler.h"
+#include "genericH.h"
 
 void fileCompiling(char* fileName) {
     // Create the output file name
