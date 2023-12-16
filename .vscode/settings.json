@@ -3,6 +3,7 @@
     "iostream": "cpp",
     "preassembler.h": "c",
     "typeinfo": "c",
-    "__node_handle": "c"
+    "__node_handle": "c",
+    "stdbool.h": "c"
   }
 }

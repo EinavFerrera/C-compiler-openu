@@ -22,6 +22,34 @@ typedef struct contentNode
 	contentNode next;				  /*pointer to the next node in list*/
 } item;
 
+typedef struct mcrNode
+{
+	char name[MAX_LINE_SIZE]; /*name of the macro*/
+	char *mcrContent;		  /*pointer to the macro content*/
+	mcrNode next;
+} obj;
+
+mcrNode createNewMcrNode(char *name, char *content, mcrNode *head)
+{
+	mcrNode newMcrNode = (mcrNode)calloc(1, sizeof(mcrNode) + 1);
+	strcpy(newMcrNode->name, name);
+	newMcrNode->mcrContent = content;
+	mcrNode current = *head;
+	if (current == NULL)
+	{
+		*head = newMcrNode;
+	}
+	else
+	{
+		while (current->next != NULL)
+		{
+			current = current->next;
+		}
+		current->next = newMcrNode;
+	}
+	return newMcrNode;
+}
+
 contentNode createNewNode(char *line, int lineAdress)
 {
 	contentNode newNode = (contentNode)calloc(1, sizeof(item));
