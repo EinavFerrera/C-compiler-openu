@@ -23,20 +23,24 @@ node createNewNode(char *line ,int lineAdress)
 	node newNode = (node)calloc(1, sizeof(item));
     strcpy(newNode->originalLine, line);  
 	newNode->lineNum = 	lineAdress;	
-newNode->lableAddressLine = NULL;   
-newNode->operandCount = operandCounter;   
-newNode->operandType[0] = NULL;    
-newNode->operandType[1] = NULL;    
-newNode->operandImm[0] = NULL;	    
-newNode->operandImm[1] = NULL;	    
-newNode->operandReg[0] = NULL; 	   
-newNode->operandReg[1] = NULL; 	   
-newNode->operandLabel[0] = NULL;  
-newNode->operandLabel[1] = NULL;  
-newNode->ARE = ARECheck;			    
-strcpy(newNode->labelText,labelCheck);
-newNode->lineSize = lineSizeCalc;	      
-newNode->lineType = lineTypeCheck;        
-newNode->next = NULL;	
+	newNode->lableAddressLine = NULL;
+	newNode->operandCount = NULL;   
+	newNode->operandType[0] = NULL;    
+	newNode->operandType[1] = NULL;    
+	newNode->operandImm[0] = NULL;	    
+	newNode->operandImm[1] = NULL;	    
+	newNode->operandReg[0] = NULL; 	   
+	newNode->operandReg[1] = NULL; 	   
+	newNode->operandLabel[0] = NULL;  
+	newNode->operandLabel[1] = NULL;  
+	newNode->ARE = NULL;			    
+	newNode->lineSize = NULL;	      
+	newNode->lineType = NULL;        
+	newNode->next = NULL;	
 	return newNode;
+}
+
+void nodeInit(node *node,node *head){
+
+
 }
