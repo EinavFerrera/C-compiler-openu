@@ -1,1 +1,1 @@
-typedef struct node *node;
+typedef struct contentNode *contentNode;
