@@ -1,5 +1,8 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include "genericH.h"
 #include "nodes.h"
+
 
 typedef struct node
 {
@@ -17,6 +20,13 @@ typedef struct node
     int lineType;          /*type of the instruction - DATA/CODE/ENTRY/EXT*/
 	node next;			    /*pointer to the next node in list*/
 } item;
+
+typedef struct isMCR
+{
+	char mcrName[MAX_LINE_SIZE];
+	
+	int numOfLines;	
+}
 
 node createNewNode(char *line ,int lineAdress)
 {

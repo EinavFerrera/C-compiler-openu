@@ -52,7 +52,27 @@ void extractMcr(FILE *inputFile, FILE *outputFile)
     
     
 }
-    
+
+int srcMcr(char *startOfLine, bool *isMcr)
+{
+	char mcr[] = "mcr";
+	char endmcr[] = "endmcr";
+
+	if (((strncmp(startOfLine, mcr, 3)) == 0) && ((*(startOfLine + 3) == '\t') || (*(startOfLine + 3) == ' '))) /*search for 'mcr'*/
+	{
+		*isMcr = true;
+		return MCR;
+	}
+	else if (((strncmp(startOfLine, endmcr, 6)) == 0) && ((*(startOfLine + 6) == '\t') || (*(startOfLine + 6) == '\r') || (*(startOfLine + 6) == '\n') || (*(startOfLine + 6) == ' '))) /*search for 'endmcr'*/
+	{
+		*isMcr = false;
+		return ENDMCR;
+	}
+	else /*no MCR in line*/
+	{
+		return NOMCR;
+	}
+}   
     
     
     
@@ -100,6 +120,5 @@ void extractMcr(FILE *inputFile, FILE *outputFile)
 // 	fclose(original);
 // }
 
-// int checkMcrFun(char *beginLine, bool *isMCRO)
-// {}
+
     
