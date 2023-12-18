@@ -3,32 +3,6 @@
 #include "genericH.h"
 #include "nodes.h"
 
-typedef struct contentNode
-{
-	char originalLine[MAX_LINE_SIZE]; /*original line from the file*/
-	int lineNum;					  /*line number in the original file*/
-	int lableAddressLine;			  /*address of label in ob*/
-	int operandCount;				  /*number of operands if its a command*/
-	int operandType[2];				  /*[0] - operand 1. [1] - operand 2|| imm,reg,label*/
-	int operandImm[2];				  /*if the operand is number*/
-	int operandReg[2];				  /*if the operand is register*/
-	char *operandLabel[2];			  /*if the operand is label*/
-	int ARE;						  /*A/R/E address*/
-	char labelText[MAX_LINE_SIZE];	  /*original label*/
-	int lineSize;					  /*number of words needed in the IC\DC*/
-	int lineType;					  /*type of the instruction - DATA/CODE/ENTRY/EXT*/
-	int opCode;						  /*the codenum of the operation*/
-	int numOfWords;					  /*number of words in data line*/
-	contentNode next;				  /*pointer to the next node in list*/
-} item;
-
-typedef struct mcrNode
-{
-	char name[MAX_LINE_SIZE]; /*name of the macro*/
-	char *mcrContent;		  /*pointer to the macro content*/
-	mcrNode next;
-} obj;
-
 mcrNode createNewMcrNode(char *name, char *content, mcrNode *head)
 {
 	mcrNode newMcrNode = (mcrNode)calloc(1, sizeof(mcrNode) + 1);
@@ -50,6 +24,9 @@ mcrNode createNewMcrNode(char *name, char *content, mcrNode *head)
 	return newMcrNode;
 }
 
+/*
+@param line - line content
+@param lineAdress - number of the line*/
 contentNode createNewNode(char *line, int lineAdress)
 {
 	contentNode newNode = (contentNode)calloc(1, sizeof(item));
@@ -57,14 +34,15 @@ contentNode createNewNode(char *line, int lineAdress)
 	newNode->lineNum = lineAdress;
 	newNode->lableAddressLine = NULL;
 	newNode->operandCount = NULL;
+	newNode->labelText[0] = '\0';
 	newNode->operandType[0] = NULL;
 	newNode->operandType[1] = NULL;
 	newNode->operandImm[0] = NULL;
 	newNode->operandImm[1] = NULL;
 	newNode->operandReg[0] = NULL;
 	newNode->operandReg[1] = NULL;
-	newNode->operandLabel[0] = NULL;
-	newNode->operandLabel[1] = NULL;
+	newNode->operandLabel[0][0] = '\0';
+	newNode->operandLabel[1][0] = '\0';
 	newNode->numOfWords = NULL;
 	newNode->ARE = NULL;
 	newNode->lineSize = NULL;
@@ -80,35 +58,8 @@ void nodeInit(contentNode *node, contentNode *head)
 	strcpy(line, (*node)->originalLine);
 	char *delimiters = " \t,\n";
 	char *token = strtok(line, delimiters);
-	while (token != NULL)
-	{
-		typeProperties(*node, token); // sets the lineType = DATA/EXT/ENT
-		codeProperties(*node, token); // sets the lineType = DATA/EXT/ENT
 
-		if (token[strlen(token) - 1] == ':')
-		{
-			if ((*node)->labelText != NULL)
-			{
-				printf("Error: In line %d - label already exists\n", (*node)->lineNum);
-				return;
-			}
-			strncpy((*node)->labelText, token, strlen(token) - 1);
-		}
-		else if (token[0] == '#')
-		{
-			(*node)->operandType[(*node)->operandCount] = IMM;
-			(*node)->operandImm[(*node)->operandCount] = atoi(token + 1);
-			(*node)->operandCount++;
-		}
-		else if (token[0] == 'r' && token[1] >= '0' && token[1] <= '7' && strlen(token) == 2)
-		{
-			(*node)->operandType[(*node)->operandCount] = REG;
-			(*node)->operandReg[(*node)->operandCount] = atoi(token + 1);
-			(*node)->operandCount++;
-		}
-	}
-	token = strtok(NULL, delimiters);
-
+	/*make the last node in line*/
 	contentNode current = *head;
 	if (current == NULL)
 	{
@@ -122,15 +73,67 @@ void nodeInit(contentNode *node, contentNode *head)
 		}
 		current->next = *node;
 	}
+
+	while (token != NULL)
+	{
+		typeProperties(*node, token); // sets the lineType = DATA/EXT/ENT
+		codeProperties(*node, token); // if its a code line sets the operandCount,optype,opImm,opReg,opLabel,numOfWords,opCode
+
+		/* if its a starting label of the line (XYZ:)*/
+
+		if (token[strlen(token) - 1] == ':' && strlen(token) <= MAX_LABEL_SIZE)
+		{
+			if ((*node)->labelText != NULL)
+			{
+				printf("Error: In line %d - label declaration already exists\n", (*node)->lineNum);
+				return;
+			}
+			strncpy((*node)->labelText, token, strlen(token) - 1);
+		}
+		/* if its a immidiate (-4)*/
+
+		else if (token[0] == '#')
+		{
+			(*node)->operandType[(*node)->operandCount] = IMM;
+			(*node)->operandImm[(*node)->operandCount] = atoi(token + 1);
+			(*node)->operandCount++;
+		}
+		/* if its a register (r4)*/
+
+		else if (token[0] == 'r' && token[1] >= '0' && token[1] <= '7' && strlen(token) == 2)
+		{
+			(*node)->operandType[(*node)->operandCount] = REG;
+			(*node)->operandReg[(*node)->operandCount] = atoi(token + 1);
+			(*node)->operandCount++;
+		}
+		/* if its a label (XYZ)*/
+
+		else if (strlen(token) <= MAX_LABEL_SIZE && isalpha(token[0]))
+		{
+			(*node)->operandType[(*node)->operandCount] = LABEL;
+			strcpy((*node)->operandLabel[(*node)->operandCount], token);
+			(*node)->operandCount++;
+		}
+		/* if its a data label (XYZ[3])*/
+		else if (token[strlen(token) - 1] == ']' && strchr(token, '[') != NULL)
+		{
+			char *label = strtok(token, "[");
+			char *numStr = strtok(NULL, "]");
+			if (label != NULL && numStr != NULL)
+			{
+				(*node)->operandType[(*node)->operandCount] = DATA_LABEL;
+				strcpy((*node)->operandLabel[(*node)->operandCount], label);
+				(*node)->operandImm[(*node)->operandCount] = atoi(numStr);
+				(*node)->operandCount++;
+			}
+		}
+		token = strtok(NULL, delimiters);
+	}
 }
 
 void typeProperties(contentNode *node, char *token)
 {
-	if (strcmp(token, ".data") == 0)
-	{
-		(*node)->lineType = DATA;
-	}
-	else if (strcmp(token, ".string") == 0)
+	if (strcmp(token, ".data") == 0 || strcmp(token, ".string") == 0)
 	{
 		(*node)->lineType = DATA;
 	}
@@ -142,7 +145,7 @@ void typeProperties(contentNode *node, char *token)
 	{
 		(*node)->lineType = EXT;
 	}
-	else
+	else if (token[0] == '.')
 	{
 		printf("Error: In line %d - unknown directive\n", (*node)->lineNum);
 	}
@@ -231,4 +234,28 @@ void codeProperties(contentNode *node, char *token)
 		(*node)->opCode = 15;
 		(*node)->lineSize = 0;
 	}
+}
+
+void printNode(contentNode node)
+{
+	printf("***************************************************************************\n");
+	printf("originalLine: %s\n", node->originalLine);
+	printf("lineNum: %d\n", node->lineNum);
+	printf("lineType: %d\n", node->lineType);
+	printf("labelText: %s\n", node->labelText);
+	printf("operandLabel[0]: %s\n", node->operandLabel[0]);
+	printf("operandLabel[1]: %s\n", node->operandLabel[1]);
+	printf("opCode: %d\n", node->opCode);
+	printf("operandImm[0]: %d\n", node->operandImm[0]);
+	printf("operandImm[1]: %d\n", node->operandImm[1]);
+	printf("operandCount: %d\n", node->operandCount);
+	printf("operandType[0]: %d\n", node->operandType[0]);
+	printf("operandType[1]: %d\n", node->operandType[1]);
+	printf("operandReg[0]: %d\n", node->operandReg[0]);
+	printf("operandReg[1]: %d\n", node->operandReg[1]);
+	printf("lableAddressLine: %d\n", node->lableAddressLine);
+	printf("ARE: %d\n", node->ARE);
+	printf("lineSize: %d\n", node->lineSize);
+	printf("numOfWords: %d\n", node->numOfWords);
+	printf("***************************************************************************\n");
 }
