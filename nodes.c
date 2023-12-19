@@ -29,25 +29,28 @@ mcrNode createNewMcrNode(char *name, char *content, mcrNode *head)
 @param lineAdress - number of the line*/
 contentNode createNewNode(char *line, int lineAdress)
 {
-	contentNode newNode = (contentNode)calloc(1, sizeof(item));
-	strcpy(newNode->originalLine, line);
+	contentNode newNode = (contentNode)calloc(1, sizeof(contentNode));
+	if (line != NULL)
+	{
+		strcpy(newNode->originalLine, line);
+	}
 	newNode->lineNum = lineAdress;
-	newNode->lableAddressLine = NULL;
-	newNode->operandCount = NULL;
+	newNode->lableAddressLine = NA;
+	newNode->operandCount = NA;
 	newNode->labelText[0] = '\0';
-	newNode->operandType[0] = NULL;
-	newNode->operandType[1] = NULL;
-	newNode->operandImm[0] = NULL;
-	newNode->operandImm[1] = NULL;
-	newNode->operandReg[0] = NULL;
-	newNode->operandReg[1] = NULL;
+	newNode->operandType[0] = NA;
+	newNode->operandType[1] = NA;
+	newNode->operandImm[0] = NA;
+	newNode->operandImm[1] = NA;
+	newNode->operandReg[0] = NA;
+	newNode->operandReg[1] = NA;
 	newNode->operandLabel[0][0] = '\0';
 	newNode->operandLabel[1][0] = '\0';
-	newNode->numOfWords = NULL;
-	newNode->ARE = NULL;
-	newNode->lineSize = NULL;
-	newNode->lineType = NULL;
-	newNode->opCode = NULL;
+	newNode->numOfWords = NA;
+	newNode->ARE = NA;
+	newNode->lineSize = NA;
+	newNode->lineType = NA;
+	newNode->opCode = NA;
 	newNode->next = NULL;
 	return newNode;
 }
@@ -235,27 +238,47 @@ void codeProperties(contentNode *node, char *token)
 		(*node)->lineSize = 0;
 	}
 }
-
+void insertNode(contentNode *head, contentNode *tail, contentNode newNode)
+{
+	if (*head != NULL)
+	{
+		(*head)->next = &newNode;
+		*tail = &newNode;
+	}
+	else
+	{
+		(*tail)->next = newNode;
+		*tail = &newNode;
+	}
+}
+void setNext(contentNode list, contentNode toSet)
+{
+	list->next = getNext(toSet);
+}
+contentNode *getNext(contentNode list)
+{
+	return list->next;
+}
 void printNode(contentNode node)
 {
 	printf("***************************************************************************\n");
 	printf("originalLine: %s\n", node->originalLine);
-	printf("lineNum: %d\n", node->lineNum);
-	printf("lineType: %d\n", node->lineType);
-	printf("labelText: %s\n", node->labelText);
-	printf("operandLabel[0]: %s\n", node->operandLabel[0]);
-	printf("operandLabel[1]: %s\n", node->operandLabel[1]);
-	printf("opCode: %d\n", node->opCode);
-	printf("operandImm[0]: %d\n", node->operandImm[0]);
-	printf("operandImm[1]: %d\n", node->operandImm[1]);
-	printf("operandCount: %d\n", node->operandCount);
-	printf("operandType[0]: %d\n", node->operandType[0]);
-	printf("operandType[1]: %d\n", node->operandType[1]);
-	printf("operandReg[0]: %d\n", node->operandReg[0]);
-	printf("operandReg[1]: %d\n", node->operandReg[1]);
-	printf("lableAddressLine: %d\n", node->lableAddressLine);
-	printf("ARE: %d\n", node->ARE);
-	printf("lineSize: %d\n", node->lineSize);
-	printf("numOfWords: %d\n", node->numOfWords);
-	printf("***************************************************************************\n");
+	// printf("lineNum: %d\n", node->lineNum);
+	// printf("lineType: %d\n", node->lineType);
+	// printf("labelText: %s\n", node->labelText);
+	// printf("operandLabel[0]: %s\n", node->operandLabel[0]);
+	// printf("operandLabel[1]: %s\n", node->operandLabel[1]);
+	// printf("opCode: %d\n", node->opCode);
+	// printf("operandImm[0]: %d\n", node->operandImm[0]);
+	// printf("operandImm[1]: %d\n", node->operandImm[1]);
+	// printf("operandCount: %d\n", node->operandCount);
+	// printf("operandType[0]: %d\n", node->operandType[0]);
+	// printf("operandType[1]: %d\n", node->operandType[1]);
+	// printf("operandReg[0]: %d\n", node->operandReg[0]);
+	// printf("operandReg[1]: %d\n", node->operandReg[1]);
+	// printf("lableAddressLine: %d\n", node->lableAddressLine);
+	// printf("ARE: %d\n", node->ARE);
+	// printf("lineSize: %d\n", node->lineSize);
+	// printf("numOfWords: %d\n", node->numOfWords);
+	// printf("***************************************************************************\n");
 }

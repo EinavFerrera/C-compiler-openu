@@ -5,6 +5,7 @@
     "typeinfo": "c",
     "__node_handle": "c",
     "stdbool.h": "c",
-    "__locale": "c"
+    "__locale": "c",
+    "chrono": "c"
   }
 }
