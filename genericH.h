@@ -13,15 +13,16 @@ enum constantsValues
 {
     NA = -1,
     MCR = 7,
-    ENDMCR = 8,
-    NOMCR = 9,
-    IMM = 10,
-    REG = 11,
-    LABEL = 12,
-    DATA = 13,
-    DATA_LABEL = 14,
-    CODE = 15,
-    ENTRY = 16,
-    EXT = 17
+    ENDMCR,
+    NOMCR,
+    IMM,
+    REG,
+    LABEL,
+    DATA_LABEL,
+    DATA_INT,
+    DATA_STRING,
+    CODE,
+    ENTRY,
+    EXT
 };
 #endif

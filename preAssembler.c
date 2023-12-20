@@ -31,32 +31,21 @@ void fileCompiling(char *fileName)
     // clear notes
     // extractMcr(inputFile, outputFile);
     char line[MAX_LINE_SIZE];
-    int lineCounter = 0;
-    contentNode headNode = NULL;
-    contentNode tail = NULL;
-    contentNode newNode;
+    int lineCounter = 1;
+    cNode headNode = NULL;
+    cNode newNode;
 
     while (fgets(line, sizeof(line), inputFile))
     {
-        printf("\n\n**************************%d***********************\n\n", lineCounter);
-        newNode = createNewNode(line, lineCounter);
-        insertNode(&headNode, &tail, newNode);
-        // nodeInit(&newNode, &head);
+        newNode = createNewNode(line, lineCounter, &headNode);
+        nodeInit(&newNode, &headNode);
         lineCounter++;
     }
-    printNode(headNode);
-    printNode(getNext(headNode));
-    printNode(getNext(headNode->next));
+    printLoop(headNode);
 
-    // print loop
-    // contentNode currentNode = headNode;
-    // while (currentNode != NULL)
-    // {
-    //     printNode(currentNode);
-    //     currentNode = currentNode->next;
-    // }
     fclose(inputFile);
     fclose(outputFile);
+    return;
 }
 
 // void extractMcr(FILE *inputFile, FILE *outputFile)

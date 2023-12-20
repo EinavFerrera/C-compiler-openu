@@ -1,3 +1,3 @@
-abel: cmp #123, r3
-bne label, r4
-x: .data 1,3,-12
+asd: bne abcde[-8], #-122443
+bbef: .data 19,13,24,6
+.string "abcdefg"

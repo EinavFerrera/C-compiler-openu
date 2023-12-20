@@ -6,6 +6,9 @@
     "__node_handle": "c",
     "stdbool.h": "c",
     "__locale": "c",
-    "chrono": "c"
+    "chrono": "c",
+    "nodes.h": "c",
+    "generich.h": "c",
+    "sstream": "c"
   }
 }
