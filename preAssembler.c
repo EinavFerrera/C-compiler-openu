@@ -1,6 +1,4 @@
 #include "genericH.h"
-#include "nodes.h"
-#include "preAssembler.h"
 
 void fileCompiling(char *fileName)
 {
@@ -10,8 +8,10 @@ void fileCompiling(char *fileName)
     strcat(outputFileName, ".am");
 
     // Open the input file
-    strcat(fileName, ".as");
-    FILE *inputFile = fopen(fileName, "r");
+    char fileNameAs[MAX_LINE_SIZE];
+    strcpy(fileNameAs, fileName);
+    strcat(fileNameAs, ".as");
+    FILE *inputFile = fopen(fileNameAs, "r");
     if (inputFile == NULL)
     {
         printf("Failed to open the file.\n");
@@ -30,18 +30,7 @@ void fileCompiling(char *fileName)
     // clear spaces and tabs
     // clear notes
     // extractMcr(inputFile, outputFile);
-    char line[MAX_LINE_SIZE];
-    int lineCounter = 1;
-    cNode headNode = NULL;
-    cNode newNode;
-
-    while (fgets(line, sizeof(line), inputFile))
-    {
-        newNode = createNewNode(line, lineCounter, &headNode);
-        nodeInit(&newNode, &headNode);
-        lineCounter++;
-    }
-    printLoop(headNode);
+    // replace defines
 
     fclose(inputFile);
     fclose(outputFile);

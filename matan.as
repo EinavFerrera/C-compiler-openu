@@ -1,3 +1,2 @@
-asd: bne abcde[-8], #-122443
-bbef: .data 19,13,24,6
-.string "abcdefg"
+asd: bnef 8asdf, #-122443
+asd: r6, #3, #-122443

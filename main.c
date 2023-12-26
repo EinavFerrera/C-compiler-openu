@@ -16,6 +16,11 @@ int main(int argc, char *argv[])
 		for (i = 1; i < argc; i++)
 		{
 			fileCompiling(argv[i]);
+			printf("************ Pre Assembler finished succssesfully for file %s! ************\n", argv[i]);
+			fAssembler(argv[i]);
+			// checks if there where no errors
+			// if (errorsNodesCheck == 0)
+			printf("************ File \"%s\" compiled successfully! ************ \n", argv[i]);
 		}
 	}
 	return 0;

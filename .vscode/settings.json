@@ -9,6 +9,8 @@
     "chrono": "c",
     "nodes.h": "c",
     "generich.h": "c",
-    "sstream": "c"
-  }
+    "sstream": "c",
+    "stdlib.h": "c"
+  },
+  "C_Cpp.errorSquiggles": "disabled"
 }

@@ -1,6 +1,5 @@
 #ifndef preAssembler
 #define preAssembler
-#include <stdbool.h>
 
 /**
  * Compiles the given file.
