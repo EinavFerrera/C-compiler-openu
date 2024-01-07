@@ -1,5 +1,6 @@
 typedef struct contentNode *cNode; /*definition of pointer to generic struct*/
 typedef struct mcrNode *mNode;
+typedef struct listNode *lNode;
 
 typedef struct contentNode
 {
@@ -30,14 +31,26 @@ typedef struct mcrNode
     struct mcrNode *next;
 } mcr_object;
 
+typedef struct listNode
+{
+    char name[MAX_LABEL_SIZE]; /*name of the macro*/
+    int lineNumber;            /*pointer to the macro content*/
+    int type;                  /*type of ENTRY/EXT/DATA_LABAL/LABEL/USED_LABEL*/
+    int declarationError;      /*for every ENTRY/DATA_LABEL/OP_LABEL => LABEL/EXT. negative for error*/
+    lNode next;
+} list_object;
+
 // mNode createNewMcrNode(char *name, char *content, mNode *head);
 cNode createNewNode(char *line, int lineAdress, cNode *head);
 void nodeInit(cNode *node, cNode *head);
 void typeProperties(cNode *node, char *token);
 int codeProperties(cNode *node, char *token);
 void printNode(cNode node);
+void printListLoop(lNode head);
 void printLoop(cNode head);
 void insertDataIntNode(cNode *node, char *token);
 void insertDataStringNode(cNode *node, char *token);
 int isOnlyDigit(char *token);
 int isOnlyAlpha(char *token);
+void addNode(cNode head, cNode node);
+void setNextNode(cNode node, cNode nextNode);

@@ -156,37 +156,50 @@ void printLoop(cNode head)
 		currentNode = currentNode->next;
 	}
 }
+void printListLoop(lNode head)
+{
+	while (head != NULL)
+	{
+		printf("name:_%s_\tline number:_%d_\ttype::_%d_\terror?:_%d_\n", head->name, head->lineNumber, head->type, head->declarationError);
+		head = head->next;
+	}
+}
 void printNode(cNode node)
 {
-	printf("originalLine: %s\n", node->originalLine);
-	printf("lineNum: %d\n", node->lineNum);
-	printf("lineType: %d\n", node->lineType);
-	printf("operandType[0]: %d\n", node->operandType[0]);
-	printf("operandType[1]: %d\n\n", node->operandType[1]);
-	printf("labelText: %s\n", node->labelText);
-	printf("operandLabel[0]: %s\n", node->operandLabel[0]);
-	printf("operandLabel[1]: %s\n", node->operandLabel[1]);
-	printf("opCode: %d\n", node->opCode);
-	printf("operandImm[0]: %d\n", node->operandImm[0]);
-	printf("operandImm[1]: %d\n", node->operandImm[1]);
-	printf("operandCount: %d\n", node->operandCount);
-	printf("operandReg[0]: %d\n", node->operandReg[0]);
-	printf("operandReg[1]: %d\n", node->operandReg[1]);
-	printf("lableAddressLine: %d\n", node->lableAddressLine);
-	printf("ARE: %d\n", node->ARE);
-	printf("lineSize: %d\n", node->lineSize);
-	printf("errorCount: %d\n", node->errorCount);
-	printf("numOfWords: %d\n", node->numOfWords);
-	for (int i = 0; i < node->numOfWords; i++)
+	if (node == NULL)
 	{
-		if (node->lineType == DATA_STRING)
-		{
-			printf("Data[%d]: %c\n", i, node->dataArray[i]);
-		}
-		else
-			printf("Data[%d]: %d\n", i, node->dataArray[i]);
+		printf("node is null\n");
+		return;
 	}
-	printf("***************************************************************************\n");
+	printf("originalLine: %s\n", node->originalLine);
+	// printf("lineNum: %d\n", node->lineNum);
+	// printf("lineType: %d\n", node->lineType);
+	// printf("operandType[0]: %d\n", node->operandType[0]);
+	// printf("operandType[1]: %d\n", node->operandType[1]);
+	// printf("labelText: _%s_\n", node->labelText);
+	// printf("operandLabel[0]: %s\n", node->operandLabel[0]);
+	// printf("operandLabel[1]: %s\n", node->operandLabel[1]);
+	// printf("opCode: %d\n", node->opCode);
+	// printf("operandImm[0]: %d\n", node->operandImm[0]);
+	// printf("operandImm[1]: %d\n", node->operandImm[1]);
+	// printf("operandCount: %d\n", node->operandCount);
+	// printf("operandReg[0]: %d\n", node->operandReg[0]);
+	// printf("operandReg[1]: %d\n", node->operandReg[1]);
+	// printf("lableAddressLine: %d\n", node->lableAddressLine);
+	// printf("ARE: %d\n", node->ARE);
+	// printf("lineSize: %d\n", node->lineSize);
+	// printf("errorCount: %d\n", node->errorCount);
+	// printf("numOfWords: %d\n", node->numOfWords);
+	// for (int i = 0; i < node->numOfWords; i++)
+	// {
+	// 	if (node->lineType == DATA_STRING)
+	// 	{
+	// 		printf("Data[%d]: %c\n", i, node->dataArray[i]);
+	// 	}
+	// 	else
+	// 		printf("Data[%d]: %d\n", i, node->dataArray[i]);
+	// }
+	// printf("_______________\n");
 }
 cNode createNewNode(char *line, int lineAdress, cNode *head)
 {
@@ -197,6 +210,8 @@ cNode createNewNode(char *line, int lineAdress, cNode *head)
 	}
 	newNode->lineNum = lineAdress;
 	newNode->lableAddressLine = NA;
+	newNode->lineType = NA;
+	newNode->opCode = NA;
 	newNode->operandCount = 0;
 	newNode->labelText[0] = '\0';
 	newNode->operandType[0] = NA;
@@ -212,8 +227,6 @@ cNode createNewNode(char *line, int lineAdress, cNode *head)
 	newNode->errorCount = 0;
 	newNode->numOfWords = NA;
 	newNode->lineSize = NA;
-	newNode->lineType = NA;
-	newNode->opCode = NA;
 	newNode->next = *head;
 	*head = newNode;
 	return newNode;
@@ -228,7 +241,12 @@ void nodeInit(cNode *node, cNode *head)
 	char *token = strtok(line, delimiters);
 	while (token != NULL)
 	{
-		// scanf("%s", &var);
+		if ((*node)->operandCount > 1)
+		{
+			printf("Error: In line %d - too many operands in the line\n", (*node)->lineNum);
+			(*node)->errorCount++;
+			return;
+		}
 		printf("token:_%s_\n", token);
 
 		/* if its a starting label of the line (XYZ:)*/
@@ -242,6 +260,13 @@ void nodeInit(cNode *node, cNode *head)
 				return;
 			}
 			strncpy((*node)->labelText, token, strlen(token) - 1);
+		}
+		// if its a code line
+		else if ((*node)->opCode == NA && codeProperties(&(*node), token)) // if its a code line sets the operandCount,optype,opImm,opReg,opLabel,numOfWords,opCode
+		{
+			printf("\t\t\ti am a CODE DECLERATION\n");
+
+			(*node)->lineType = CODE;
 		}
 		/* if its a immidiate (-4)*/
 		else if (token[0] == '#')
@@ -315,24 +340,31 @@ void nodeInit(cNode *node, cNode *head)
 				insertDataStringNode(&(*node), strtok(NULL, "\""));
 				return;
 			}
-		}
-		// if its a code line
-		else if (codeProperties(&(*node), token)) // if its a code line sets the operandCount,optype,opImm,opReg,opLabel,numOfWords,opCode
-		{
-			printf("\t\t\ti am a CODE DECLERATION\n");
-
-			(*node)->lineType = CODE;
+			else if ((*node)->lineType == ENTRY)
+			{
+				printf("\t\t\ti am a ENTRY line\n");
+				char label[MAX_LABEL_SIZE];
+				strcpy(label, strtok(NULL, "\n"));
+				strcpy((*node)->operandLabel[0], label);
+				(*node)->operandType[0] = ENTRY;
+				(*node)->operandCount++;
+				return;
+			}
+			else if ((*node)->lineType == EXT)
+			{
+				printf("\t\t\ti am a EXT line\n");
+				char label[MAX_LABEL_SIZE];
+				strcpy(label, strtok(NULL, "\n"));
+				strcpy((*node)->operandLabel[0], label);
+				(*node)->operandType[0] = EXT;
+				(*node)->operandCount++;
+				return;
+			}
 		}
 		// if its a data line
 		else
 		{
 			printf("Error: In line %d - \"%s\" is not a valid label\n", (*node)->lineNum, token);
-			(*node)->errorCount++;
-			return;
-		}
-		if ((*node)->operandCount > 1)
-		{
-			printf("Error: In line %d - too many operands in the line\n", (*node)->lineNum);
 			(*node)->errorCount++;
 			return;
 		}
@@ -406,4 +438,29 @@ int isOnlyAlpha(char *token)
 		i++;
 	}
 	return true;
+}
+void setNextNode(cNode node, cNode nextNode)
+{
+	node->next = nextNode;
+}
+void addNode(cNode head, cNode newNode)
+{
+	cNode *current = &head;
+	printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\tinside Adding node :_%d_%d\n", &head, current);
+	if ((*current) == NULL)
+	{
+		head = newNode;
+		printNode(head);
+		printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\tadded first Node\n");
+	}
+	/*
+	else
+	{
+		while (current->next != NULL)
+		{
+			printf("adding sec or more node \n");
+			setNextNode(current, newNode);
+		}
+		setNextNode(current, newNode);
+	}*/
 }

@@ -56,5 +56,7 @@ enum nodeAttributes
     NUM_OF_WORDS,
     DATA_ARRAY,
     ERROR_COUNT,
+    DECLERATION,
+    USED_LABEL
 };
 #endif

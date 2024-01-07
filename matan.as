@@ -1,2 +1,7 @@
-asd: bnef 8asdf, #-122443
-asd: r6, #3, #-122443
+a: add Ya7sdGF, #-122443
+.entry ENTRTR
+b: r6, #-122443
+c: #123, #-122443
+laeer: #123, Y85sd[3]
+.extern EXTERE
+YOYO: .data "ABCG"
