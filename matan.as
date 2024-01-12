@@ -1,7 +1,8 @@
-a: add Ya7sdGF, #-122443
-.entry ENTRTR
-b: r6, #-122443
+a: add c  , #-122443               
+.entry lae
+YO: r6, #-122443
 c: #123, #-122443
-laeer: #123, Y85sd[3]
+lae: #123 YOYO[2] ,
 .extern EXTERE
-YOYO: .data "ABCG"
+YOYO: .string "ABCG"
+g: .data 5 ,123456 , 987

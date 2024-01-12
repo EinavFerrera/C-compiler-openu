@@ -57,6 +57,8 @@ enum nodeAttributes
     DATA_ARRAY,
     ERROR_COUNT,
     DECLERATION,
-    USED_LABEL
+    USED_LABEL,
+    MAIN_TYPE,
+    TYPE
 };
 #endif

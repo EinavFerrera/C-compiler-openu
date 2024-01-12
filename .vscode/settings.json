@@ -10,7 +10,9 @@
     "nodes.h": "c",
     "generich.h": "c",
     "sstream": "c",
-    "stdlib.h": "c"
+    "stdlib.h": "c",
+    "filesystem": "c",
+    "stack": "c"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }

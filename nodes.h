@@ -19,9 +19,10 @@ typedef struct contentNode
     int ARE;                              /*A/R/E address*/
     int lineSize;                         /*number of words needed in the IC\DC*/
     int numOfWords;                       /*number of words in data line*/
-    int *dataArray;
-    int errorCount; /*count of errors in the line*/
-    cNode next;     /*pointer to the next node in list*/
+    int errorCount;                       /*count of errors in the line*/
+    int commaErrorFlag;                   /*flag for comma error*/
+    int *dataArray;                       /*pointer to the start of array of data*/
+    cNode next;                           /*pointer to the next node in list*/
 } contentNode_object;
 
 typedef struct mcrNode
@@ -35,7 +36,8 @@ typedef struct listNode
 {
     char name[MAX_LABEL_SIZE]; /*name of the macro*/
     int lineNumber;            /*pointer to the macro content*/
-    int type;                  /*type of ENTRY/EXT/DATA_LABAL/LABEL/USED_LABEL*/
+    int mainType;              /*type of DECLERATION or USED LABEL*/
+    int type;                  /*ENTRY/EXT/DATA_LABAL/LABEL/OP_LABEL*/
     int declarationError;      /*for every ENTRY/DATA_LABEL/OP_LABEL => LABEL/EXT. negative for error*/
     lNode next;
 } list_object;
@@ -54,3 +56,7 @@ int isOnlyDigit(char *token);
 int isOnlyAlpha(char *token);
 void addNode(cNode head, cNode node);
 void setNextNode(cNode node, cNode nextNode);
+int commasCounter(char *line);
+void clearBlankChars(char *line, char *newLine);
+int hasSpacesInWord(char *line);
+void clearHeadAndTailBlanks(char *line);
