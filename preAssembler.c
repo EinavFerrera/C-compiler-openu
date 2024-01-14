@@ -128,14 +128,39 @@ void fileCompiling(char *fileName)
 // // 	}
 // // 	fclose(original);
 // // }
+#define MAX_LINES 1000
+#define MAX_LINE_LENGTH 100
 
-#define MAX_DEFINES 100
-#define MAX_LINE_LENGTH 1000
+void processMacro(char *input[], int *lineCount);
+void processMacro(char *input[], int *lineCount) {
+    char *macroName = NULL;
+    char *macroContents[MAX_LINES];
+    int macroLineCount = 0;
+
+    for (int i = 0; i < *lineCount; i++) {
+        if (strncmp(input[i], "mcr", 3) == 0) {
+            macroName = strtok(input[i] + 4, " ");
+            i++; // Skip the mcr line
+            while (strncmp(input[i], "endmcr", 6) != 0) {
+                macroContents[macroLineCount++] = input[i++];
+            }
+        } else if (macroName != NULL && strncmp(input[i], macroName, strlen(macroName)) == 0) {
+            // Replace macro invocation with macroContents
+            for (int j = 0; j < macroLineCount; j++) {
+                input[*lineCount + j] = macroContents[j];
+            }
+            *lineCount += macroLineCount;
+            macroName = NULL; // Reset macroName after processing
+        }
+    }
+}
+
+
 
 typedef struct {
-    char name[MAX_LINE_LENGTH];
-    int value;
-    int defined;
+    char name[MAX_LINE_LENGTH]; // array of defines
+    int value; //define's value
+    int defined; // the flag indicate if the define is already exists
 } Define;
 
 Define defines[MAX_DEFINES] = {0};
@@ -168,24 +193,37 @@ void replaceDefines(char *text) {
                 strncpy(name, &text[nameStart], nameEnd - nameStart);
                 name[nameEnd - nameStart] = '\0';
 
-                int defineIndex = getDefineIndex(name);
-
-                if (defineIndex == -1) {
-                    // Define not found, add it
-                    for (int j = 0; j < MAX_DEFINES; j++) {
-                        if (!defines[j].defined) {
-                            strcpy(defines[j].name, name);
-                            sscanf(&text[nameEnd + 1], "%d", &defines[j].value);
-                            defines[j].defined = 1;
-                            break;
-                        }
-                    }
-                } else {
-                    // Define already exists, show an error
-                    printf("Error: Define '%s' redefined.\n", name);
-                    exit(EXIT_FAILURE);
+                // Find the position of '='
+                int equalsPos = nameEnd;
+                while (isspace(text[equalsPos])) {
+                    equalsPos++;
                 }
 
+                if (text[equalsPos] == '=') {
+                    // Skip whitespace after '='
+                    equalsPos++;
+                    while (isspace(text[equalsPos])) {
+                        equalsPos++;
+                    }
+
+                    int defineIndex = getDefineIndex(name);
+
+                    if (defineIndex == -1) {
+                        // Define not found, add it
+                        for (int j = 0; j < MAX_DEFINES; j++) {
+                            if (!defines[j].defined) {
+                                strcpy(defines[j].name, name);
+                                sscanf(&text[equalsPos], "%d", &defines[j].value);
+                                defines[j].defined = 1;
+                                break;
+                            }
+                        }
+                    } else {
+                        // Define already exists, show an error
+                        printf("Error: Define '%s' redefined.\n", name);
+                        exit(EXIT_FAILURE);
+                    }
+                }
             }
         } else if (isalpha(text[i])) {
             // Find the end of the define name
