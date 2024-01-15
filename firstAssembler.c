@@ -32,53 +32,86 @@ void fAssembler(char *fileName)
         return;
     }
     // checks if label are valid - declared and used, no double declerationsm no data label out of limits
-    lNode labelListDeclared = NULL;
+    lNode labelList = NULL;
     int srcList[] = {LABEL_TEXT, OPERAND_TYPE_1, OPERAND_TYPE_2, LINE_TYPE};
     int srcListLenght = sizeof(srcList) / sizeof(srcList[0]);
-    labelListDeclared = createLabelsList(headNode, labelListDeclared, srcList, srcListLenght);
-    validateLabelList(labelListDeclared, headNode);
+    labelList = createLabelsList(headNode, labelList, srcList, srcListLenght);
+    validateLabelList(labelList, headNode);
     printf("\t\t\t\t\t\t\t\t\t************ label list is valid\n");
-    // checks if there are no extra commas in the end of line
+
+    if (searchListNode(labelList, "20", TYPE) != NULL)
+    {
+        printf("\t\t\t\t\t\t\t\t\t************ entry label created\n");
+        createEntryExternFile(labelList, ENTRY);
+    }
+    if (searchListNode(labelList, "21", TYPE) != NULL)
+    {
+        createEntryExternFile(labelList, EXT);
+        printf("\t\t\t\t\t\t\t\t\t************ extern Label created\n");
+    }
+    // checks if type oparnd: both imm/reg = 00, local label = 10 , external label = 01
+    AREAssign(headNode, labelList);
+    printf("\t\t\t\t\t\t\t\t\t************ ARE assigned\n");
+    numOfLinesAssign(headNode);
+
+    printLoop(headNode);
 
     fclose(inputFile);
 }
-int checkExtraCommas(cNode head)
-{
-    char *line = head->originalLine;
-    int commaCount = 0;
-    int operandCount = 0;
-    int i = 0;
-
-    while (line[i] != '\0')
-    {
-        if (line[i] == ',')
-        {
-            commaCount++;
-        }
-        i++;
-    }
-    // if data int = commas = number of vars - 1 and
-
-    if (commaCount > 1 || operandCount < 2)
-    {
-        printf("ERROR: Extra commas or missing comma between operands in the line: %s\n", line);
-        return 1; // Error
-    }
-
-    return 0; // No error
-}
-
-// checks id there is no more than one string in .string
-// no labels in .ent and .ext
-// label in entry is valid and exists
-// no same labler as entry and as extern
-// no duplicated labels DATA
-// no spaces between label and :
-// checks if type oparnd: both imm/reg = 00, local label = 10 , external label = 01
-// check if the lables used are exists as ENTRY, EXT, or DATA
-// check if the data lables has engouth vars in the array as we try to use
 // check the count of par, thier types and locations are valid for the CODE, add numOFLines to the node
 // data lable = 2 words in memory ( one for the label and one for the imm)
+void createEntryExternFile(lNode labelList, int searchAttr)
+{
+}
+void AREAssign(cNode headNode, lNode labelList)
+{
+    // checks if type oparnd: both imm/reg = 00, local label = 10 , external label = 01
+    cNode temp = headNode;
+    while (temp != NULL)
+    {
+        if (temp->lineType != CODE)
+        {
+            temp = temp->next;
+            continue;
+        }
+        if (((temp->operandType[0] == IMM || temp->operandType[0] == REG) &&
+             (temp->operandType[1] == IMM || temp->operandType[1] == REG)) ||
+            ((temp->operandCount == 1 && (temp->operandType[0] == REG || temp->operandType[0] == IMM))) ||
+            (temp->operandCount == 0))
+        {
+            temp->ARE = 00;
+        }
+        else if (temp->operandType[0] == LABEL)
+        {
+            lNode tempLabel = searchListNode(labelList, temp->operandLabel[0], LABEL_TEXT);
+            while (tempLabel != NULL)
+            {
+                if (tempLabel->type == EXT)
+                {
+                    temp->ARE = 01;
+                }
+                tempLabel = searchListNode(tempLabel->next, temp->operandLabel[0], LABEL_TEXT);
+            }
+        }
+        else if (temp->operandType[1] == LABEL)
+        {
+            lNode tempLabel = searchListNode(labelList, temp->operandLabel[1], LABEL_TEXT);
+            while (tempLabel != NULL)
+            {
+                if (tempLabel->type == EXT)
+                {
+                    temp->ARE = 01;
+                }
+                tempLabel = searchListNode(tempLabel->next, temp->operandLabel[1], LABEL_TEXT);
+            }
+        }
+        else
+        {
+            temp->ARE = 10;
+        }
+        temp = temp->next;
+    }
+}
 
 int validateLabelList(lNode listHead, cNode headNode)
 {
