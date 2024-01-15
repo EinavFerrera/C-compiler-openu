@@ -6,7 +6,7 @@ typedef struct contentNode
 {
     char originalLine[MAX_LINE_SIZE];     /*original line from the file*/
     int lineNum;                          /*line number in the original file*/
-    int lineType;                         /*type of the instruction - DATA/CODE/ENTRY/EXT*/
+    int lineType;                         /*type of the instruction - DATA_INT/DATA_STRING/CODE/ENTRY/EXT*/
     char labelText[MAX_LABEL_SIZE];       /*original label*/
     int opCode;                           /*the codenum of the operation*/
     int operandCount;                     /*number of operands in the line for CODE*/
@@ -57,6 +57,7 @@ int isOnlyAlpha(char *token);
 void addNode(cNode head, cNode node);
 void setNextNode(cNode node, cNode nextNode);
 int commasCounter(char *line);
-void clearBlankChars(char *line, char *newLine);
+void clearDuplicateBlankChars(char *line, char *newLine);
 int hasSpacesInWord(char *line);
-void clearHeadAndTailBlanks(char *line);
+char *clearHeadAndTailBlanks(char *line);
+void clearAllBlanks(char *line);

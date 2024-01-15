@@ -24,13 +24,17 @@ void fAssembler(char *fileName)
         nodeInit(&newNode, &headNode);
         lineCounter++;
     }
-    printLoop(headNode);
+    // printLoop(headNode);
     printf("\t\t\t\t\t\t\t\t\t************ Pre Assembler finished succssesfully for file %s! \n", fileName);
+    if (searchNode(headNode, "", ERROR_COUNT) != NULL)
+    {
+        printf("\t\t\t\t\t\t\t\t\t************ There are errors in the file %s! \n", fileName);
+        return;
+    }
     // checks if label are valid - declared and used, no double declerationsm no data label out of limits
     lNode labelListDeclared = NULL;
     int srcList[] = {LABEL_TEXT, OPERAND_TYPE_1, OPERAND_TYPE_2, LINE_TYPE};
     int srcListLenght = sizeof(srcList) / sizeof(srcList[0]);
-    printf("this?\n");
     labelListDeclared = createLabelsList(headNode, labelListDeclared, srcList, srcListLenght);
     validateLabelList(labelListDeclared, headNode);
     printf("\t\t\t\t\t\t\t\t\t************ label list is valid\n");
@@ -77,7 +81,6 @@ int checkExtraCommas(cNode head)
 // check if the data lables has engouth vars in the array as we try to use
 // check the count of par, thier types and locations are valid for the CODE, add numOFLines to the node
 // data lable = 2 words in memory ( one for the label and one for the imm)
-// lablesChain(&headNode);
 
 int validateLabelList(lNode listHead, cNode headNode)
 {

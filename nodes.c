@@ -177,8 +177,8 @@ void printNode(cNode node)
 	printf("operandType[0]: %d\n", node->operandType[0]);
 	printf("operandType[1]: %d\n", node->operandType[1]);
 	printf("labelText: _%s_\n", node->labelText);
-	printf("operandLabel[0]: %s\n", node->operandLabel[0]);
-	printf("operandLabel[1]: %s\n", node->operandLabel[1]);
+	printf("operandLabel[0]: _%s_\n", node->operandLabel[0]);
+	printf("operandLabel[1]: _%s_\n", node->operandLabel[1]);
 	printf("opCode: %d\n", node->opCode);
 	printf("operandImm[0]: %d\n", node->operandImm[0]);
 	printf("operandImm[1]: %d\n", node->operandImm[1]);
@@ -207,7 +207,7 @@ cNode createNewNode(char *line, int lineAdress, cNode *head)
 	char noBlankLine[MAX_LINE_SIZE];
 	if (line != NULL)
 	{
-		clearBlankChars(line, noBlankLine);
+		clearDuplicateBlankChars(line, noBlankLine);
 		strcpy(newNode->originalLine, noBlankLine);
 	}
 	newNode->lineNum = lineAdress;
@@ -237,20 +237,20 @@ cNode createNewNode(char *line, int lineAdress, cNode *head)
 void nodeInit(cNode *node, cNode *head)
 {
 	char line[MAX_LINE_SIZE];
+	char tempToken[MAX_LABEL_SIZE];
 	strcpy(line, (*node)->originalLine);
 
 	char *delimiters = " \t,\n";
 	char *token = strtok(line, delimiters);
 	while (token != NULL)
 	{
-		printf("token:_%s_\n", token);
-		clearHeadAndTailBlanks(token);
 		if (hasSpacesInWord(token))
 		{
 			printf("Error: In line %d - \"%s\" is not a valid label\n", (*node)->lineNum, token);
 			(*node)->errorCount++;
 			return;
 		}
+		clearAllBlanks(token);
 
 		if ((*node)->operandCount > 2)
 		{
@@ -279,16 +279,19 @@ void nodeInit(cNode *node, cNode *head)
 			(*node)->lineType = CODE;
 		}
 		/* if its a immidiate (-4)*/
-		else if (token[0] == '#')
+		else if (token[0] == '#' && (*node)->lineType == CODE)
 		{
 			// printf("\t\t\ti am a IMM\n");
-
 			(*node)->operandType[(*node)->operandCount] = IMM;
 			(*node)->operandImm[(*node)->operandCount] = atoi(token + 1);
 			(*node)->operandCount++;
 		}
 		/* if its a register (r4)*/
-		else if (token[0] == 'r' && token[1] >= '0' && token[1] <= '7' && strlen(token) == 2)
+		else if (token[0] == 'r' &&
+				 token[1] >= '0' &&
+				 token[1] <= '7' &&
+				 strlen(token) == 2 &&
+				 (*node)->lineType == CODE)
 		{
 			// printf("\t\t\ti am a REG\n");
 
@@ -297,7 +300,9 @@ void nodeInit(cNode *node, cNode *head)
 			(*node)->operandCount++;
 		}
 		/* if its a data label (XYZ[3])*/
-		else if (token[strlen(token) - 1] == ']' && strchr(token, '[') != NULL)
+		else if (token[strlen(token) - 1] == ']' &&
+				 strchr(token, '[') != NULL &&
+				 (*node)->lineType == CODE)
 		{
 			// printf("\t\t\ti am a DATA LABEL\n");
 
@@ -321,7 +326,9 @@ void nodeInit(cNode *node, cNode *head)
 			}
 		}
 		/* if its a opLabel (XYZ)*/
-		else if (strlen(token) <= MAX_LABEL_SIZE && isalpha(token[0]))
+		else if (strlen(token) <= MAX_LABEL_SIZE &&
+				 isalpha(token[0]) &&
+				 (*node)->lineType == CODE)
 		{
 			if ((*node)->opCode == NA)
 			{
@@ -355,7 +362,19 @@ void nodeInit(cNode *node, cNode *head)
 			{
 				// printf("\t\t\ti am a ENTRY line\n");
 				char label[MAX_LABEL_SIZE];
-				strcpy(label, strtok(NULL, "\n"));
+				strcpy(label, strtok(NULL, " \t\n"));
+				if (commasCounter((*node)->originalLine) > 0)
+				{
+					printf("Error: In line %d - no commas allowed in entry line\n", (*node)->lineNum);
+					(*node)->errorCount++;
+					return;
+				}
+				if (strtok(NULL, "\n") != NULL)
+				{
+					printf("Error: In line %d - entry line gets only one lable at the time\n", (*node)->lineNum);
+					(*node)->errorCount++;
+					return;
+				}
 				strcpy((*node)->operandLabel[0], label);
 				(*node)->operandType[0] = ENTRY;
 				(*node)->operandCount++;
@@ -365,7 +384,19 @@ void nodeInit(cNode *node, cNode *head)
 			{
 				// printf("\t\t\ti am a EXT line\n");
 				char label[MAX_LABEL_SIZE];
-				strcpy(label, strtok(NULL, "\n"));
+				strcpy(label, strtok(NULL, " \t\n"));
+				if (commasCounter((*node)->originalLine) > 0)
+				{
+					printf("Error: In line %d - no commas allowed in extern line\n", (*node)->lineNum);
+					(*node)->errorCount++;
+					return;
+				}
+				if (strtok(NULL, "\n") != NULL)
+				{
+					printf("Error: In line %d - extern line gets only one lable at the time\n", (*node)->lineNum);
+					(*node)->errorCount++;
+					return;
+				}
 				strcpy((*node)->operandLabel[0], label);
 				(*node)->operandType[0] = EXT;
 				(*node)->operandCount++;
@@ -375,10 +406,17 @@ void nodeInit(cNode *node, cNode *head)
 		// if its a data line
 		else
 		{
-			printf("Error: In line %d - \"%s\" is not a valid label\n", (*node)->lineNum, token);
+			if (!strcmp(token, "\0"))
+			{
+				printf("Error: In line %d - blank charachters are no an valid label command\n", (*node)->lineNum);
+				(*node)->errorCount++;
+				return;
+			}
+			printf("Error: In line %d - \"%s\" is not a valid label or command\n", (*node)->lineNum, token);
 			(*node)->errorCount++;
 			return;
 		}
+
 		// if past code and linetype is code
 		if ((*node)->lineType == CODE)
 		{
@@ -389,7 +427,7 @@ void nodeInit(cNode *node, cNode *head)
 			token = strtok(NULL, delimiters);
 		}
 	}
-	if ((*node)->operandCount <= commasCounter((*node)->originalLine))
+	if ((*node)->operandCount != 0 && (*node)->operandCount <= commasCounter((*node)->originalLine))
 	{
 		printf("Error: In line %d - too many commas.\n", (*node)->lineNum);
 		(*node)->errorCount++;
@@ -465,7 +503,6 @@ void insertDataStringNode(cNode *node, char *token)
 	}
 	for (int i = 0; i < strLength; i++)
 	{
-
 		(*node)->dataArray = (int *)realloc((*node)->dataArray, sizeof(int) * ((*node)->numOfWords + 1));
 		(*node)->dataArray[i] = token[i];
 		(*node)->numOfWords++;
@@ -561,29 +598,31 @@ int hasSpacesInWord(char *line)
 	}
 	return false;
 }
-void clearHeadAndTailBlanks(char *line)
+char *clearHeadAndTailBlanks(char *line)
 {
 	int i = 0;
 	int j = 0;
+	char *tempChar = (char *)calloc(1, sizeof(char) * (strlen(line) + 1));
 	while (line[i] != '\0' && (line[i] == ' ' || line[i] == '\t'))
 	{
 		i++;
 	}
 	while (line[i] != '\0')
 	{
-		line[j] = line[i];
+		tempChar[j] = line[i];
 		i++;
 		j++;
 	}
-	line[j] = '\0';
+	tempChar[j] = '\0';
 	i = strlen(line) - 1;
 	while (i >= 0 && (line[i] == ' ' || line[i] == '\t'))
 	{
-		line[i] = '\0';
+		tempChar[i] = '\0';
 		i--;
 	}
+	return tempChar;
 }
-void clearBlankChars(char *line, char *newLine)
+void clearDuplicateBlankChars(char *line, char *newLine)
 {
 	int i = 1;
 	int j = 1;
@@ -602,4 +641,21 @@ void clearBlankChars(char *line, char *newLine)
 		i++;
 	}
 	newLine[j] = '\0';
+}
+void clearAllBlanks(char *line)
+{
+	int i = 0;
+	int j = 0;
+	char newLine[32];
+	while (line[i] != '\0')
+	{
+		if (line[i] != ' ' && line[i] != '\t')
+		{
+			newLine[j] = line[i];
+			j++;
+		}
+		i++;
+	}
+	newLine[j] = '\0';
+	strcpy(line, newLine);
 }
