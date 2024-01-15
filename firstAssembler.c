@@ -25,7 +25,7 @@ void fAssembler(char *fileName)
         lineCounter++;
     }
     // printLoop(headNode);
-    printf("\t\t\t\t\t\t\t\t\t************ Pre Assembler finished succssesfully for file %s! \n", fileName);
+    printf("\t\t\t\t\t\t\t\t\t************ code to nodes finished for file %s! \n", fileName);
     if (searchNode(headNode, "", ERROR_COUNT) != NULL)
     {
         printf("\t\t\t\t\t\t\t\t\t************ There are errors in the file %s! \n", fileName);
@@ -68,8 +68,6 @@ int checkExtraCommas(cNode head)
     return 0; // No error
 }
 
-// checks if there are no double commas between oprands or lables
-// checks if there are no extra commas between lable to CODE or DATA
 // checks id there is no more than one string in .string
 // no labels in .ent and .ext
 // label in entry is valid and exists
