@@ -54,7 +54,7 @@ void fAssembler(char *fileName)
     printf("\t\t\t\t\t\t\t\t\t************ ARE assigned\n");
     numOfLinesAssign(headNode);
 
-    printLoop(headNode);
+    // printLoop(headNode);
 
     fclose(inputFile);
 }
@@ -63,6 +63,10 @@ void fAssembler(char *fileName)
 void createEntryExternFile(lNode labelList, int searchAttr)
 {
 }
+void numOfLinesAssign(cNode headNode)
+{
+}
+
 void AREAssign(cNode headNode, lNode labelList)
 {
     // checks if type oparnd: both imm/reg = 00, local label = 10 , external label = 01
