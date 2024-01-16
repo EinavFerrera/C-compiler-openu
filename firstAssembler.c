@@ -22,6 +22,11 @@ void fAssembler(char *fileName)
     {
         newNode = createNewNode(line, lineCounter, &headNode);
         nodeInit(&newNode, &headNode);
+        if (newNode->lineType == CODE)
+        {
+            // printNode(newNode);
+            validOperandPerCode(newNode);
+        }
         lineCounter++;
     }
     // printLoop(headNode);
@@ -50,21 +55,289 @@ void fAssembler(char *fileName)
         printf("\t\t\t\t\t\t\t\t\t************ extern Label created\n");
     }
     // checks if type oparnd: both imm/reg = 00, local label = 10 , external label = 01
+    // printListLoop(labelList);
     AREAssign(headNode, labelList);
     printf("\t\t\t\t\t\t\t\t\t************ ARE assigned\n");
-    numOfLinesAssign(headNode);
-
+    int IC = 100;
+    int DC = 0;
+    numOfLinesAssign(headNode, &IC, &DC);
+    fixLineAdress(headNode, IC);
+    addAdressToLabelList(labelList, headNode);
     // printLoop(headNode);
 
     fclose(inputFile);
 }
-// check the count of par, thier types and locations are valid for the CODE, add numOFLines to the node
 // data lable = 2 words in memory ( one for the label and one for the imm)
+// label do not have CODE or preserve name in memory
+// DATA INT or DATA STRING gets the DATA COUNTER number. other LABELS get the IC number
+void numOfLinesAssign(cNode headNode, int *IC, int *DC)
+{
+    cNode temp = headNode;
+    if (temp != NULL)
+    {
+        numOfLinesAssign(temp->next, &(*IC), &(*DC));
+    }
+    else
+    {
+        return;
+    }
+    if (temp->lineType == DATA_INT)
+    {
+        temp->lineSize = temp->numOfWords;
+        temp->lableAddressLine = (*DC);
+        (*DC) += temp->lineSize;
+    }
+    else if (temp->lineType == DATA_STRING)
+    {
+        temp->lineSize = temp->numOfWords;
+        temp->lableAddressLine = (*DC);
+        (*DC) += temp->lineSize;
+    }
+    else if (temp->lineType == CODE)
+    {
+        temp->numOfWords = 1;
+        if (temp->operandType[0] == REG &&
+            temp->operandType[1] == REG)
+        {
+            temp->numOfWords++;
+        }
+        else
+        {
+            if (temp->operandType[0] == IMM ||
+                temp->operandType[0] == REG ||
+                temp->operandType[0] == LABEL)
+            {
+                temp->numOfWords++;
+            }
+            if (temp->operandType[1] == IMM ||
+                temp->operandType[1] == REG ||
+                temp->operandType[1] == LABEL)
+            {
+                temp->numOfWords++;
+            }
+            if (temp->operandType[0] == DATA_LABEL ||
+                temp->operandType[1] == DATA_LABEL)
+            {
+                temp->numOfWords += 2;
+            }
+        }
+        temp->lineSize = temp->numOfWords;
+        temp->lableAddressLine = (*IC);
+        (*IC) += temp->lineSize;
+    }
+    else if (temp->lineType == ENTRY ||
+             temp->lineType == EXT)
+    {
+        temp->numOfWords = 0;
+    }
+}
+void fixLineAdress(cNode headNode, int IC)
+{
+    cNode temp = headNode;
+    while (temp != NULL)
+    {
+        if (temp->lineType == DATA_INT || temp->lineType == DATA_STRING)
+        {
+            temp->lableAddressLine += IC;
+        }
+        temp = temp->next;
+    }
+}
+void addAdressToLabelList(lNode labelListhead, cNode headNode)
+{
+    lNode temp = labelList;
+    while (temp != NULL)
+    {
+        if (temp->type == DATA_LABEL)
+        {
+            temp->lableAddressLine += adress;
+        }
+        temp = temp->next;
+    }
+}
 void createEntryExternFile(lNode labelList, int searchAttr)
 {
 }
-void numOfLinesAssign(cNode headNode)
+// 0 = IMM , 1 = LABEL , 2 = DATA LABEL , 3 = REG
+// 1. src . 2. dst
+/*1  cmp = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2. IMM, LABEL,DATA LABEL, REG
+/*0  mov = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2.      LABEL,DATA LABEL, REG
+/*2  add = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2.      LABEL,DATA LABEL, REG
+/*3  sub = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2.      LABEL,DATA LABEL, REG
+/*6  lea = 2 operands, 1. LABEL, DATA LABEL               2.      LABEL,DATA LABEL, REG
+/*12 prn = 1 operand,                                     2. IMM, LABEL,DATA LABEL, REG
+/*4  not = 1 operand,                                     2.      LABEL,DATA LABEL, REG
+/*5  clr = 1 operand,                                     2.      LABEL,DATA LABEL, REG
+/*7  inc = 1 operand,                                     2.      LABEL,DATA LABEL, REG
+/*8  dec = 1 operand,                                     2.      LABEL,DATA LABEL, REG
+/*11 red = 1 operand,                                     2.      LABEL,DATA LABEL, REG
+/*9  jmp = 1 operand,                                     2.      LABEL,            REG
+/*10 bne = 1 operand,                                     2.      LABEL,            REG
+/*13 jsr = 1 operand,                                     2.      LABEL,            REG
+/*14 rts = 0 operand
+/*15 hlt = 0 operand
+*/
+void validOperandPerCode(cNode node)
 {
+    switch (node->opCode)
+    {
+    case 1: // cmp
+        if (node->operandCount != 2)
+        {
+            printf("ERROR: In line %d - command 'cmp' should have 2 operands.\n", node->lineNum);
+            node->errorCount++;
+            return;
+        }
+
+        if (node->operandType[0] != IMM &&
+            node->operandType[0] != LABEL &&
+            node->operandType[0] != DATA_LABEL &&
+            node->operandType[0] != REG)
+        {
+            printf("ERROR: In line %d - command 'cmp' first operand should be IMM, LABEL, DATA LABEL, or REG.\n", node->lineNum);
+            node->errorCount++;
+        }
+
+        if (node->operandType[1] != IMM &&
+            node->operandType[1] != LABEL &&
+            node->operandType[1] != DATA_LABEL &&
+            node->operandType[1] != REG)
+        {
+            printf("ERROR: In line %d - command 'cmp' second operand should be IMM, LABEL, DATA LABEL, or REG.\n", node->lineNum);
+            node->errorCount++;
+        }
+        break;
+
+    case 0: // mov
+    case 2: // add
+    case 3: // sub
+        if (node->operandCount != 2)
+        {
+            printf("ERROR: In line %d - command 'mov/add/sub' should have 2 operands.\n", node->lineNum);
+            node->errorCount++;
+            return;
+        }
+
+        // Check the validity of the first operand
+        if (node->operandType[0] != IMM &&
+            node->operandType[0] != LABEL &&
+            node->operandType[0] != DATA_LABEL &&
+            node->operandType[0] != REG)
+        {
+            printf("ERROR: In line %d - command 'mov/add/sub' first operand should be IMM, LABEL, DATA LABEL, or REG.\n", node->lineNum);
+            node->errorCount++;
+        }
+
+        // Check the validity of the second operand
+        if (node->operandType[1] != LABEL &&
+            node->operandType[1] != DATA_LABEL &&
+            node->operandType[1] != REG)
+        {
+            printf("ERROR: In line %d - command 'mov/add/sub' second operand should be LABEL, DATA LABEL, or REG.\n", node->lineNum);
+            node->errorCount++;
+        }
+        break;
+
+    case 6: // lea
+        if (node->operandCount != 2)
+        {
+            printf("ERROR: In line %d - command 'lea' should have 2 operands.\n", node->lineNum);
+            node->errorCount++;
+            return;
+        }
+
+        // Check the validity of the first operand
+        if (node->operandType[0] != LABEL &&
+            node->operandType[0] != DATA_LABEL)
+        {
+            printf("ERROR: In line %d - command 'lea' first operand should be LABEL or DATA LABEL.\n", node->lineNum);
+            node->errorCount++;
+        }
+
+        // Check the validity of the second operand
+        if (node->operandType[1] != LABEL &&
+            node->operandType[1] != DATA_LABEL &&
+            node->operandType[1] != REG)
+        {
+            printf("ERROR: In line %d - command 'lea' second operand should be LABEL, DATA LABEL, or REG.\n", node->lineNum);
+            node->errorCount++;
+        }
+        break;
+    case 12: // prn
+        if (node->operandCount != 1)
+        {
+            printf("ERROR: In line %d - command 'prn' should have 1 operand.\n", node->lineNum);
+            node->errorCount++;
+            return;
+        }
+
+        // Check the validity of the operand
+        if (node->operandType[0] != IMM &&
+            node->operandType[0] != LABEL &&
+            node->operandType[0] != DATA_LABEL &&
+            node->operandType[0] != REG)
+        {
+            printf("ERROR: In line %d - command 'prn' operand should be IMM, LABEL, DATA LABEL, or REG.\n", node->lineNum);
+            node->errorCount++;
+        }
+        break;
+
+    case 4:  // not
+    case 5:  // clr
+    case 7:  // inc
+    case 8:  // dec
+    case 11: // red
+        if (node->operandCount != 1)
+        {
+            printf("ERROR: In line %d - command not/clr/inc/dec/red should have 1 operand.\n", node->lineNum);
+            node->errorCount++;
+            return;
+        }
+
+        // Check the validity of the operand
+        if (node->operandType[0] != LABEL &&
+            node->operandType[0] != DATA_LABEL &&
+            node->operandType[0] != REG)
+        {
+            printf("ERROR: In line %d - command not/clr/inc/dec/red operand should be LABEL, DATA LABEL, or REG.\n", node->lineNum);
+            node->errorCount++;
+        }
+        break;
+
+    case 9:  // jmp
+    case 10: // bne
+    case 13: // jsr
+        if (node->operandCount != 1)
+        {
+            printf("ERROR: In line %d - command jmp/bne/jsr should have 1 operand.\n", node->lineNum);
+            node->errorCount++;
+            return;
+        }
+
+        // Check the validity of the operand
+        if (node->operandType[0] != LABEL &&
+            node->operandType[0] != REG)
+        {
+            printf("ERROR: In line %d - command jmp/bne/jsr operand should be LABEL or REG.\n", node->lineNum);
+            node->errorCount++;
+        }
+        break;
+
+    case 14: // rts
+    case 15: // hlt
+        if (node->operandCount != 0)
+        {
+            printf("ERROR: In line %d - command rts/hlt should have 0 operands.\n", node->lineNum);
+            node->errorCount++;
+        }
+        break;
+
+    default:
+        // Handle cases for opcodes without operands
+        printf("ERROR: In line %d - opCode '%d' isn't recognize.\n", node->lineNum, node->opCode);
+        node->errorCount++;
+        break;
+    }
 }
 
 void AREAssign(cNode headNode, lNode labelList)
@@ -73,6 +346,8 @@ void AREAssign(cNode headNode, lNode labelList)
     cNode temp = headNode;
     while (temp != NULL)
     {
+        int p = 0;
+
         if (temp->lineType != CODE)
         {
             temp = temp->next;
@@ -85,19 +360,27 @@ void AREAssign(cNode headNode, lNode labelList)
         {
             temp->ARE = 00;
         }
-        else if (temp->operandType[0] == LABEL)
+        else if (temp->operandType[0] == LABEL || temp->operandType[0] == DATA_LABEL)
         {
+
             lNode tempLabel = searchListNode(labelList, temp->operandLabel[0], LABEL_TEXT);
             while (tempLabel != NULL)
             {
+
                 if (tempLabel->type == EXT)
                 {
                     temp->ARE = 01;
+                    break;
+                }
+                else if (tempLabel->mainType == DECLERATION)
+                {
+                    temp->ARE = 10;
+                    break;
                 }
                 tempLabel = searchListNode(tempLabel->next, temp->operandLabel[0], LABEL_TEXT);
             }
         }
-        else if (temp->operandType[1] == LABEL)
+        else if (temp->operandType[1] == LABEL || temp->operandType[1] == DATA_LABEL)
         {
             lNode tempLabel = searchListNode(labelList, temp->operandLabel[1], LABEL_TEXT);
             while (tempLabel != NULL)
@@ -105,6 +388,12 @@ void AREAssign(cNode headNode, lNode labelList)
                 if (tempLabel->type == EXT)
                 {
                     temp->ARE = 01;
+                    break;
+                }
+                else if (tempLabel->mainType == DECLERATION)
+                {
+                    temp->ARE = 10;
+                    break;
                 }
                 tempLabel = searchListNode(tempLabel->next, temp->operandLabel[1], LABEL_TEXT);
             }
@@ -119,10 +408,10 @@ void AREAssign(cNode headNode, lNode labelList)
 
 int validateLabelList(lNode listHead, cNode headNode)
 {
+    lNode temp = listHead;
+    lNode toCompare = NULL;
 
-    lNode temp = listHead;  // 1
-    lNode toCompare = NULL; // A,B,C...
-    while (temp != NULL)    // 1,2,3...
+    while (temp != NULL)
     {
         if (temp->mainType == DECLERATION && temp->declarationError == 1)
         {
@@ -213,6 +502,7 @@ int validateLabelList(lNode listHead, cNode headNode)
 }
 lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int numOfAttr)
 {
+
     cNode newTempNode = (cNode)calloc(1, sizeof(contentNode_object));
     for (int i = 0; i < numOfAttr; i++)
     {
@@ -285,18 +575,22 @@ lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int 
                     newListHead = newListNode;
                     newListNode->lineNumber = newTempNode->lineNum;
                 }
+                temp = newTempNode->next;
             }
-            temp = newTempNode->next;
+            else
+            {
+                temp = NULL;
+            }
         }
     }
     return newListHead;
 }
-lNode searchListNode(lNode head, char *target, int srcAttr)
+lNode searchListNode(lNode head, char *target, int searchAttr)
 {
     lNode temp = head;
     while (temp != NULL)
     {
-        switch (srcAttr)
+        switch (searchAttr)
         {
         case LINE_NUM:
             if (strcmp(target, "") == 0)
@@ -344,7 +638,7 @@ lNode searchListNode(lNode head, char *target, int srcAttr)
             temp = temp->next;
             continue;
         default:
-            printf("ERROR: searchListNode: '%d' is not a valid attribute for search\n", srcAttr);
+            printf("ERROR: searchListNode: '%d' is not a valid attribute for search\n", searchAttr);
             return NULL;
             continue;
         }

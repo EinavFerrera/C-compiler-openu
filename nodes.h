@@ -38,6 +38,7 @@ typedef struct listNode
     int lineNumber;            /*pointer to the macro content*/
     int mainType;              /*type of DECLERATION or USED LABEL*/
     int type;                  /*ENTRY/EXT/DATA_LABAL/LABEL/OP_LABEL*/
+    int adress;                /*final adress of the label*/
     int declarationError;      /*for every ENTRY/DATA_LABEL/OP_LABEL => LABEL/EXT. negative for error*/
     lNode next;
 } list_object;

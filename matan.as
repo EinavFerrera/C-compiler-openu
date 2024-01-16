@@ -1,10 +1,13 @@
-a: add c  , #-122443               
 .entry lae
-YO: bne r6, #-122443
-c: jmp #123, bnana
-lae: hlt #123, YOYO[2] 
+a: add #-122443               , c
 .extern EXTERE
+YO: bne r6
+c: jmp bnana
+lae: cmp #123, YOYO[2] 
+gae: hlt  
+sub r3, r6      
 YOYO: .string "ABCasd"
-cmp bnana ,#123
+BABA143: .string "ABC asd   "
+cmp  #123,bnana
 g: .data 5 ,123456 , 987
 .extern bnana

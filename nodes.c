@@ -401,11 +401,11 @@ void printNode(cNode node)
 	// printf("operandCount: %d\n", node->operandCount);
 	// printf("operandReg[0]: %d\n", node->operandReg[0]);
 	// printf("operandReg[1]: %d\n", node->operandReg[1]);
-	// printf("lableAddressLine: %d\n", node->lableAddressLine);
-	printf("ARE: %d\n", node->ARE);
-	// printf("lineSize: %d\n", node->lineSize);
+	printf("lableAddressLine: %d\n", node->lableAddressLine);
+	// printf("ARE: %d\n", node->ARE);
+	printf("lineSize: %d\n", node->lineSize);
 	// printf("errorCount: %d\n", node->errorCount);
-	// printf("numOfWords: %d\n", node->numOfWords);
+	printf("numOfWords: %d\n", node->numOfWords);
 	// for (int i = 0; i < node->numOfWords; i++)
 	// {
 	// 	if (node->lineType == DATA_STRING)
@@ -516,7 +516,7 @@ int isOnlyAlpha(char *token)
 	int i = 0;
 	while (token[i] != '\0')
 	{
-		if (!isalpha(token[i]))
+		if (!isalpha(token[i]) && token[i] != ' ' && token[i] != '\t')
 		{
 			return false;
 		}
