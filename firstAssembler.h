@@ -12,5 +12,6 @@ void numOfLinesAssign(cNode headNode, int *IC, int *DC);
 void validOperandPerCode(cNode node);
 void fixLineAdress(cNode headNode, int IC);
 void addAdressToLabelList(lNode labelListhead, cNode headNode);
+int sAssembler(fileName, headNode, labelList);
 
 #endif

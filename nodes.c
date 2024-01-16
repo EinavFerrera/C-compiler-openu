@@ -376,7 +376,7 @@ void printListLoop(lNode head)
 {
 	while (head != NULL)
 	{
-		printf("name:_%s_\tline:_%d_\tmain t:_%d_\ttype:_%d_\terror?:_%d_\n", head->name, head->lineNumber, head->mainType, head->type, head->declarationError);
+		printf("name:_%s_\tline:_%d_\tmain t:_%d_\ttype:_%d_\terror?:_%d_\t adress:_%d_\n", head->name, head->lineNumber, head->mainType, head->type, head->declarationError, head->adress);
 		head = head->next;
 	}
 }
@@ -405,7 +405,7 @@ void printNode(cNode node)
 	// printf("ARE: %d\n", node->ARE);
 	printf("lineSize: %d\n", node->lineSize);
 	// printf("errorCount: %d\n", node->errorCount);
-	printf("numOfWords: %d\n", node->numOfWords);
+	// printf("numOfWords: %d\n", node->numOfWords);
 	// for (int i = 0; i < node->numOfWords; i++)
 	// {
 	// 	if (node->lineType == DATA_STRING)

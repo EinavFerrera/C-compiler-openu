@@ -1,42 +1,135 @@
 
-riginalLine: a: add #-122443 , c
 
-lineNum: 2
-lineType: 19
-operandType[0]: 13
-operandType[1]: 15
-labelText: _a_
-operandLabel[0]: __
-operandLabel[1]: _c_
-opCode: 2
-operandImm[0]: -122443
-operandImm[1]: -1
-operandCount: 2
-operandReg[0]: -1
-operandReg[1]: -1
-lableAddressLine: -1
-ARE: -1
-lineSize: 2
-errorCount: 0
-numOfWords: -1
-_______________
-originalLine: .extern bnana
 
-lineNum: 1
-lineType: 21
-operandType[0]: 21
-operandType[1]: -1
-labelText: __
-operandLabel[0]: _bnana_
-operandLabel[1]: __
-opCode: -1
-operandImm[0]: -1
-operandImm[1]: -1
-operandCount: 1
-operandReg[0]: -1
-operandReg[1]: -1
-lableAddressLine: -1
-ARE: -1
-lineSize: -1
-errorCount: 0
-numOfWords: -1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+a: add 
+#-122443
+c
+YO: bne 
+r6
+c: jmp
+bnana
+lae: cmp 
+#123,
+YOYO
+[2] 
+gae: hlt  
+sub 
+r3, r6      
+cmp  
+#123,
+bnana
+YOYO: .string "
+A
+B
+C
+a
+s
+d
+BABA143: .string "
+A
+B
+C
+ 
+ a
+ s
+     
+t"
+g: .data 5 ,
+123456
+ , 987

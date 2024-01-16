@@ -37,13 +37,25 @@ void fAssembler(char *fileName)
         return;
     }
     // checks if label are valid - declared and used, no double declerationsm no data label out of limits
+    int IC = 100;
+    int DC = 0;
+    numOfLinesAssign(headNode, &IC, &DC);
+    fixLineAdress(headNode, IC);
+    printf("\t\t\t\t\t\t\t\t\t************ adress filled\n");
+
     lNode labelList = NULL;
     int srcList[] = {LABEL_TEXT, OPERAND_TYPE_1, OPERAND_TYPE_2, LINE_TYPE};
     int srcListLenght = sizeof(srcList) / sizeof(srcList[0]);
     labelList = createLabelsList(headNode, labelList, srcList, srcListLenght);
-    validateLabelList(labelList, headNode);
+    if (!validateLabelList(labelList, headNode))
+    {
+        return;
+    }
     printf("\t\t\t\t\t\t\t\t\t************ label list is valid\n");
 
+    // checks if type oparnd: both imm/reg = 00, local label = 10 , external label = 01
+    AREAssign(headNode, labelList);
+    printf("\t\t\t\t\t\t\t\t\t************ ARE assigned\n");
     if (searchListNode(labelList, "20", TYPE) != NULL)
     {
         printf("\t\t\t\t\t\t\t\t\t************ entry label created\n");
@@ -54,22 +66,16 @@ void fAssembler(char *fileName)
         createEntryExternFile(labelList, EXT);
         printf("\t\t\t\t\t\t\t\t\t************ extern Label created\n");
     }
-    // checks if type oparnd: both imm/reg = 00, local label = 10 , external label = 01
-    // printListLoop(labelList);
-    AREAssign(headNode, labelList);
-    printf("\t\t\t\t\t\t\t\t\t************ ARE assigned\n");
-    int IC = 100;
-    int DC = 0;
-    numOfLinesAssign(headNode, &IC, &DC);
-    fixLineAdress(headNode, IC);
-    addAdressToLabelList(labelList, headNode);
-    // printLoop(headNode);
 
+    // printLoop(headNode);
+    // printListLoop(labelList);
     fclose(inputFile);
+    if (!sAssembler(fileName, headNode, labelList))
+    {
+        // free all lists
+        // return fail
+    }
 }
-// data lable = 2 words in memory ( one for the label and one for the imm)
-// label do not have CODE or preserve name in memory
-// DATA INT or DATA STRING gets the DATA COUNTER number. other LABELS get the IC number
 void numOfLinesAssign(cNode headNode, int *IC, int *DC)
 {
     cNode temp = headNode;
@@ -145,12 +151,12 @@ void fixLineAdress(cNode headNode, int IC)
 }
 void addAdressToLabelList(lNode labelListhead, cNode headNode)
 {
-    lNode temp = labelList;
+    lNode temp = labelListhead;
     while (temp != NULL)
     {
         if (temp->type == DATA_LABEL)
         {
-            temp->lableAddressLine += adress;
+            temp->adress += 3;
         }
         temp = temp->next;
     }
@@ -158,27 +164,27 @@ void addAdressToLabelList(lNode labelListhead, cNode headNode)
 void createEntryExternFile(lNode labelList, int searchAttr)
 {
 }
-// 0 = IMM , 1 = LABEL , 2 = DATA LABEL , 3 = REG
-// 1. src . 2. dst
-/*1  cmp = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2. IMM, LABEL,DATA LABEL, REG
-/*0  mov = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2.      LABEL,DATA LABEL, REG
-/*2  add = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2.      LABEL,DATA LABEL, REG
-/*3  sub = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2.      LABEL,DATA LABEL, REG
-/*6  lea = 2 operands, 1. LABEL, DATA LABEL               2.      LABEL,DATA LABEL, REG
-/*12 prn = 1 operand,                                     2. IMM, LABEL,DATA LABEL, REG
-/*4  not = 1 operand,                                     2.      LABEL,DATA LABEL, REG
-/*5  clr = 1 operand,                                     2.      LABEL,DATA LABEL, REG
-/*7  inc = 1 operand,                                     2.      LABEL,DATA LABEL, REG
-/*8  dec = 1 operand,                                     2.      LABEL,DATA LABEL, REG
-/*11 red = 1 operand,                                     2.      LABEL,DATA LABEL, REG
-/*9  jmp = 1 operand,                                     2.      LABEL,            REG
-/*10 bne = 1 operand,                                     2.      LABEL,            REG
-/*13 jsr = 1 operand,                                     2.      LABEL,            REG
-/*14 rts = 0 operand
-/*15 hlt = 0 operand
-*/
 void validOperandPerCode(cNode node)
 {
+    // 0 = IMM , 1 = LABEL , 2 = DATA LABEL , 3 = REG
+    // 1. src . 2. dst
+    /*1  cmp = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2. IMM, LABEL,DATA LABEL, REG
+    /*0  mov = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2.      LABEL,DATA LABEL, REG
+    /*2  add = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2.      LABEL,DATA LABEL, REG
+    /*3  sub = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2.      LABEL,DATA LABEL, REG
+    /*6  lea = 2 operands, 1. LABEL, DATA LABEL               2.      LABEL,DATA LABEL, REG
+    /*12 prn = 1 operand,                                     2. IMM, LABEL,DATA LABEL, REG
+    /*4  not = 1 operand,                                     2.      LABEL,DATA LABEL, REG
+    /*5  clr = 1 operand,                                     2.      LABEL,DATA LABEL, REG
+    /*7  inc = 1 operand,                                     2.      LABEL,DATA LABEL, REG
+    /*8  dec = 1 operand,                                     2.      LABEL,DATA LABEL, REG
+    /*11 red = 1 operand,                                     2.      LABEL,DATA LABEL, REG
+    /*9  jmp = 1 operand,                                     2.      LABEL,            REG
+    /*10 bne = 1 operand,                                     2.      LABEL,            REG
+    /*13 jsr = 1 operand,                                     2.      LABEL,            REG
+    /*14 rts = 0 operand
+    /*15 hlt = 0 operand
+    */
     switch (node->opCode)
     {
     case 1: // cmp
@@ -339,7 +345,6 @@ void validOperandPerCode(cNode node)
         break;
     }
 }
-
 void AREAssign(cNode headNode, lNode labelList)
 {
     // checks if type oparnd: both imm/reg = 00, local label = 10 , external label = 01
@@ -405,7 +410,6 @@ void AREAssign(cNode headNode, lNode labelList)
         temp = temp->next;
     }
 }
-
 int validateLabelList(lNode listHead, cNode headNode)
 {
     lNode temp = listHead;
@@ -482,18 +486,10 @@ int validateLabelList(lNode listHead, cNode headNode)
 
     while (temp != NULL)
     {
-        if (temp->declarationError == 0)
-        {
-            printf("ERROR: in line %d - label '%s' should be declared.\n", temp->lineNumber, temp->name);
-        }
-        temp = temp->next;
-    }
-    temp = listHead;
-
-    while (temp != NULL)
-    {
         if (temp->declarationError < 1)
         {
+            printf("ERROR: in line %d - label '%s' should be declared.\n", temp->lineNumber, temp->name);
+
             return false;
         }
         temp = temp->next;
@@ -529,6 +525,7 @@ lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int 
                     {
                         newListNode->type = DATA_STRING;
                     }
+                    newListNode->adress = newTempNode->lableAddressLine;
                 }
                 else if (
                     (listAttr[i] == OPERAND_TYPE_1) && ((newTempNode->operandType[0] == LABEL) || (newTempNode->operandType[0] == DATA_LABEL)))
