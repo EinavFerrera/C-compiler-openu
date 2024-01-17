@@ -2,7 +2,6 @@
 
 void fAssembler(char *fileName)
 {
-
     // Open the input file
     char fileNameAm[MAX_LINE_SIZE];
     strcpy(fileNameAm, fileName);
@@ -59,11 +58,8 @@ void fAssembler(char *fileName)
     // printLoop(headNode);
     // printListLoop(labelList);
     fclose(inputFile);
-    if (!sAssembler(fileName, headNode, labelList, IC + DC, IC, DC))
-    {
-        // free all lists
-        // return fail
-    }
+    sAssembler(fileName, headNode, labelList, IC + DC, IC, DC);
+    // freeAll(headNode, labelList);
 }
 void numOfLinesAssign(cNode headNode, int *IC, int *DC)
 {
@@ -523,14 +519,13 @@ void addLabelsAddressToCnode(cNode headNode, lNode labelList)
 }
 lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int numOfAttr)
 {
-
-    cNode newTempNode = (cNode)calloc(1, sizeof(contentNode_object));
+    cNode newTempNode;
     for (int i = 0; i < numOfAttr; i++)
     {
         cNode temp = orgListHead;
         while (temp != NULL)
         {
-            lNode newListNode = (lNode)calloc(1, sizeof(list_object));
+            lNode newListNode = (lNode)malloc(sizeof(list_object));
             newListNode->name[0] = '\0';
             newTempNode = searchNode(temp, "", listAttr[i]);
 
@@ -896,4 +891,25 @@ cNode *searchNode(cNode head, char *target, int srcAttr)
         }
     }
     return NULL;
+}
+void freeAll(cNode headNode, lNode labelList)
+{
+    cNode temp = headNode;
+    while (temp != NULL)
+    {
+        headNode = temp->next;
+        if (temp->dataArray != NULL)
+        {
+            free(temp->dataArray);
+        }
+        free(temp);
+        temp = headNode;
+    }
+    lNode tempL = labelList;
+    while (tempL != NULL)
+    {
+        labelList = tempL->next;
+        free(tempL);
+        tempL = labelList;
+    }
 }

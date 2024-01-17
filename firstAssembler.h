@@ -12,4 +12,5 @@ void validOperandPerCode(cNode node);
 void fixLineaddress(cNode headNode, int IC);
 void addaddressToLabelList(lNode labelListhead, cNode headNode);
 void addLabelsAddressToCnode(cNode headNode, lNode labelList);
+void freeAll(cNode headNode, lNode labelList);
 #endif

@@ -2,7 +2,7 @@
 
 cNode createNewNode(char *line, int lineaddress, cNode *head)
 {
-	cNode newNode = (cNode)calloc(1, sizeof(contentNode_object));
+	cNode newNode = (cNode)malloc(sizeof(contentNode_object));
 	char noBlankLine[MAX_LINE_SIZE];
 	if (line != NULL)
 	{
