@@ -14,7 +14,7 @@ typedef struct contentNode
     char operandLabel[2][MAX_LABEL_SIZE]; /*if the operand is label*/
     int operandImm[2];                    /*if the operand is number*/
     int operandReg[2];                    /*if the operand is register*/
-    int targetLabelAdd;                   /*if the operand is DATA LABEL, the line adderss of the data(label add + IMM + 1)*/
+    int targetLabelAdd[2];                /*if the operand is DATA LABEL or LABEL - the address where this label is*/
     int lableAddressLine;                 /*address of label in ob*/
     int ARE;                              /*A/R/E address*/
     int lineSize;                         /*number of words needed in the IC\DC*/
@@ -38,13 +38,14 @@ typedef struct listNode
     int lineNumber;            /*pointer to the macro content*/
     int mainType;              /*type of DECLERATION or USED LABEL*/
     int type;                  /*ENTRY/EXT/DATA_LABAL/LABEL/OP_LABEL*/
-    int adress;                /*final adress of the label*/
+    int address;               /*final address of the label*/
+    int EXTUsedAddress;        /*the address where EXT is used*/
     int declarationError;      /*for every ENTRY/DATA_LABEL/OP_LABEL => LABEL/EXT. negative for error*/
     lNode next;
 } list_object;
 
 // mNode createNewMcrNode(char *name, char *content, mNode *head);
-cNode createNewNode(char *line, int lineAdress, cNode *head);
+cNode createNewNode(char *line, int lineaddress, cNode *head);
 void nodeInit(cNode *node, cNode *head);
 void typeProperties(cNode *node, char *token);
 int codeProperties(cNode *node, char *token);

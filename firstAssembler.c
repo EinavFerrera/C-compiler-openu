@@ -24,7 +24,6 @@ void fAssembler(char *fileName)
         nodeInit(&newNode, &headNode);
         if (newNode->lineType == CODE)
         {
-            // printNode(newNode);
             validOperandPerCode(newNode);
         }
         lineCounter++;
@@ -40,8 +39,8 @@ void fAssembler(char *fileName)
     int IC = 100;
     int DC = 0;
     numOfLinesAssign(headNode, &IC, &DC);
-    fixLineAdress(headNode, IC);
-    printf("\t\t\t\t\t\t\t\t\t************ adress filled\n");
+    fixLineaddress(headNode, IC);
+    printf("\t\t\t\t\t\t\t\t\t************ address filled\n");
 
     lNode labelList = NULL;
     int srcList[] = {LABEL_TEXT, OPERAND_TYPE_1, OPERAND_TYPE_2, LINE_TYPE};
@@ -55,22 +54,12 @@ void fAssembler(char *fileName)
 
     // checks if type oparnd: both imm/reg = 00, local label = 10 , external label = 01
     AREAssign(headNode, labelList);
+    addLabelsAddressToCnode(headNode, labelList);
     printf("\t\t\t\t\t\t\t\t\t************ ARE assigned\n");
-    if (searchListNode(labelList, "20", TYPE) != NULL)
-    {
-        printf("\t\t\t\t\t\t\t\t\t************ entry label created\n");
-        createEntryExternFile(labelList, ENTRY);
-    }
-    if (searchListNode(labelList, "21", TYPE) != NULL)
-    {
-        createEntryExternFile(labelList, EXT);
-        printf("\t\t\t\t\t\t\t\t\t************ extern Label created\n");
-    }
-
     // printLoop(headNode);
     // printListLoop(labelList);
     fclose(inputFile);
-    if (!sAssembler(fileName, headNode, labelList))
+    if (!sAssembler(fileName, headNode, labelList, IC + DC, IC, DC))
     {
         // free all lists
         // return fail
@@ -121,6 +110,11 @@ void numOfLinesAssign(cNode headNode, int *IC, int *DC)
             {
                 temp->numOfWords++;
             }
+            if (temp->operandType[0] == DATA_LABEL &&
+                temp->operandType[1] == DATA_LABEL)
+            {
+                temp->numOfWords += 2;
+            }
             if (temp->operandType[0] == DATA_LABEL ||
                 temp->operandType[1] == DATA_LABEL)
             {
@@ -137,7 +131,7 @@ void numOfLinesAssign(cNode headNode, int *IC, int *DC)
         temp->numOfWords = 0;
     }
 }
-void fixLineAdress(cNode headNode, int IC)
+void fixLineaddress(cNode headNode, int IC)
 {
     cNode temp = headNode;
     while (temp != NULL)
@@ -149,20 +143,17 @@ void fixLineAdress(cNode headNode, int IC)
         temp = temp->next;
     }
 }
-void addAdressToLabelList(lNode labelListhead, cNode headNode)
+void addaddressToLabelList(lNode labelListhead, cNode headNode)
 {
     lNode temp = labelListhead;
     while (temp != NULL)
     {
         if (temp->type == DATA_LABEL)
         {
-            temp->adress += 3;
+            temp->address += 3;
         }
         temp = temp->next;
     }
-}
-void createEntryExternFile(lNode labelList, int searchAttr)
-{
 }
 void validOperandPerCode(cNode node)
 {
@@ -444,12 +435,13 @@ int validateLabelList(lNode listHead, cNode headNode)
                         else
                         {
                             toCompare->declarationError = 1;
+                            toCompare->address = temp->address;
                         }
                     }
                     // checks if no memory out of limits when using data[]
                     if (toCompare->type == DATA_LABEL)
                     {
-                        if (temp->type != DATA_INT && temp->type != DATA_STRING)
+                        if (temp->type != DATA_INT && temp->type != DATA_STRING && temp->type != EXT)
                         {
                             printf("ERROR: in line %d - label '%s' is not a .data or .string label.\n", toCompare->lineNumber, temp->name);
                             temp->declarationError = -1;
@@ -462,14 +454,23 @@ int validateLabelList(lNode listHead, cNode headNode)
                             cNode dataDeclare = searchNode(headNode, tempStr, LINE_NUM);
                             sprintf(tempStr, "%d", toCompare->lineNumber);
                             cNode dataUse = searchNode(headNode, tempStr, LINE_NUM);
-                            if ((dataDeclare->numOfWords) >
-                                dataUse->operandImm[1]) // can be operandImm[0]??
+                            int h = 0;
+                            if (strcmp(dataUse->operandLabel[0], toCompare->name) == 0)
+                            {
+                                h = 0;
+                            }
+                            else if (strcmp(dataUse->operandLabel[1], toCompare->name) == 0)
+                            {
+                                h = 1;
+                            }
+                            if (((dataDeclare->numOfWords) > dataUse->operandImm[h]) || dataDeclare->lineType == EXT)
                             {
                                 toCompare->declarationError = 1;
+                                toCompare->address = temp->address;
                             }
                             else
                             {
-                                printf("ERROR: in line %d - label '%s[%d]' is trying to accsess memory out of label declartion.\n", toCompare->lineNumber, temp->name, dataUse->operandImm[1]);
+                                printf("ERROR: in line %d - label '%s[%d]' is trying to accsess memory out of label declartion.\n", toCompare->lineNumber, temp->name, dataUse->operandImm[h]);
                                 temp->declarationError = -1;
                                 toCompare->declarationError = -1;
                             }
@@ -495,6 +496,30 @@ int validateLabelList(lNode listHead, cNode headNode)
         temp = temp->next;
     }
     return true;
+}
+void addLabelsAddressToCnode(cNode headNode, lNode labelList)
+{
+    cNode temp = headNode;
+    while (temp != NULL)
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            if (temp->operandType[i] == LABEL || temp->operandType[i] == DATA_LABEL)
+            {
+                lNode tempLabel = searchListNode(labelList, temp->operandLabel[i], LABEL_TEXT);
+                while (tempLabel != NULL)
+                {
+                    if (tempLabel->mainType == DECLERATION)
+                    {
+                        temp->targetLabelAdd[i] = tempLabel->address;
+                        break;
+                    }
+                    tempLabel = searchListNode(tempLabel->next, temp->operandLabel[i], LABEL_TEXT);
+                }
+            }
+        }
+        temp = temp->next;
+    }
 }
 lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int numOfAttr)
 {
@@ -525,7 +550,7 @@ lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int 
                     {
                         newListNode->type = DATA_STRING;
                     }
-                    newListNode->adress = newTempNode->lableAddressLine;
+                    newListNode->address = newTempNode->lableAddressLine;
                 }
                 else if (
                     (listAttr[i] == OPERAND_TYPE_1) && ((newTempNode->operandType[0] == LABEL) || (newTempNode->operandType[0] == DATA_LABEL)))
@@ -538,6 +563,7 @@ lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int 
                     {
                         newListNode->type = DATA_LABEL;
                     }
+                    newListNode->EXTUsedAddress = newTempNode->lableAddressLine + 1;
                 }
                 else if (
                     (listAttr[i] == OPERAND_TYPE_2) && ((newTempNode->operandType[1] == LABEL) || (newTempNode->operandType[1] == DATA_LABEL)))
@@ -549,6 +575,11 @@ lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int 
                     if (newTempNode->operandType[1] == DATA_LABEL)
                     {
                         newListNode->type = DATA_LABEL;
+                        newListNode->EXTUsedAddress = newTempNode->lableAddressLine + newTempNode->lineSize - 2;
+                    }
+                    else
+                    {
+                        newListNode->EXTUsedAddress = newTempNode->lableAddressLine + newTempNode->lineSize - 1;
                     }
                 }
                 else if ((listAttr[i] == LINE_TYPE) && (newTempNode->lineType == ENTRY))
