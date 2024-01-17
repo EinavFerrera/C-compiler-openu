@@ -59,7 +59,7 @@ void fAssembler(char *fileName)
     // printListLoop(labelList);
     fclose(inputFile);
     sAssembler(fileName, headNode, labelList, IC + DC, IC, DC);
-    // freeAll(headNode, labelList);
+    freeAll(headNode, labelList);
 }
 void numOfLinesAssign(cNode headNode, int *IC, int *DC)
 {
