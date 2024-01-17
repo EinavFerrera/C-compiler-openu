@@ -2,10 +2,10 @@
 
 void fAssembler(char *fileName)
 {
-    // Open the input file
+    /* Open the input file*/
     char fileNameAm[MAX_LINE_SIZE];
     strcpy(fileNameAm, fileName);
-    strcat(fileNameAm, ".as"); // TODO: change to .am
+    strcat(fileNameAm, ".as"); /* TODO: change to .am*/
     FILE *inputFile = fopen(fileNameAm, "r");
     if (inputFile == NULL)
     {
@@ -27,14 +27,13 @@ void fAssembler(char *fileName)
         }
         lineCounter++;
     }
-    // printLoop(headNode);
     printf("\t\t\t\t\t\t\t\t\t************ code to nodes finished for file %s! \n", fileName);
     if (searchNode(headNode, "", ERROR_COUNT) != NULL)
     {
         printf("\t\t\t\t\t\t\t\t\t************ There are errors in the file %s! \n", fileName);
         return;
     }
-    // checks if label are valid - declared and used, no double declerationsm no data label out of limits
+    /* checks if label are valid - declared and used, no double declerationsm no data label out of limits*/
     int IC = 100;
     int DC = 0;
     numOfLinesAssign(headNode, &IC, &DC);
@@ -51,12 +50,9 @@ void fAssembler(char *fileName)
     }
     printf("\t\t\t\t\t\t\t\t\t************ label list is valid\n");
 
-    // checks if type oparnd: both imm/reg = 00, local label = 10 , external label = 01
-    AREAssign(headNode, labelList);
+    /*    checks if type oparnd: both imm/reg = 00, local label = 10 , external label = 01*/
     addLabelsAddressToCnode(headNode, labelList);
     printf("\t\t\t\t\t\t\t\t\t************ ARE assigned\n");
-    // printLoop(headNode);
-    // printListLoop(labelList);
     fclose(inputFile);
     sAssembler(fileName, headNode, labelList, IC + DC, IC, DC);
     freeAll(headNode, labelList);
@@ -153,28 +149,28 @@ void addaddressToLabelList(lNode labelListhead, cNode headNode)
 }
 void validOperandPerCode(cNode node)
 {
-    // 0 = IMM , 1 = LABEL , 2 = DATA LABEL , 3 = REG
-    // 1. src . 2. dst
-    /*1  cmp = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2. IMM, LABEL,DATA LABEL, REG
-    /*0  mov = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2.      LABEL,DATA LABEL, REG
-    /*2  add = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2.      LABEL,DATA LABEL, REG
-    /*3  sub = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2.      LABEL,DATA LABEL, REG
-    /*6  lea = 2 operands, 1. LABEL, DATA LABEL               2.      LABEL,DATA LABEL, REG
-    /*12 prn = 1 operand,                                     2. IMM, LABEL,DATA LABEL, REG
-    /*4  not = 1 operand,                                     2.      LABEL,DATA LABEL, REG
-    /*5  clr = 1 operand,                                     2.      LABEL,DATA LABEL, REG
-    /*7  inc = 1 operand,                                     2.      LABEL,DATA LABEL, REG
-    /*8  dec = 1 operand,                                     2.      LABEL,DATA LABEL, REG
-    /*11 red = 1 operand,                                     2.      LABEL,DATA LABEL, REG
-    /*9  jmp = 1 operand,                                     2.      LABEL,            REG
-    /*10 bne = 1 operand,                                     2.      LABEL,            REG
-    /*13 jsr = 1 operand,                                     2.      LABEL,            REG
-    /*14 rts = 0 operand
-    /*15 hlt = 0 operand
+    /* 0 = IMM , 1 = LABEL , 2 = DATA LABEL , 3 = REG
+    1. src . 2. dst
+    1  cmp = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2. IMM, LABEL,DATA LABEL, REG
+    0  mov = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2.      LABEL,DATA LABEL, REG
+    2  add = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2.      LABEL,DATA LABEL, REG
+    3  sub = 2 operands, 1. IMM, LABEL, DATA LABEL, REG,    2.      LABEL,DATA LABEL, REG
+    6  lea = 2 operands, 1. LABEL, DATA LABEL               2.      LABEL,DATA LABEL, REG
+    12 prn = 1 operand,                                     2. IMM, LABEL,DATA LABEL, REG
+    4  not = 1 operand,                                     2.      LABEL,DATA LABEL, REG
+    5  clr = 1 operand,                                     2.      LABEL,DATA LABEL, REG
+    7  inc = 1 operand,                                     2.      LABEL,DATA LABEL, REG
+    8  dec = 1 operand,                                     2.      LABEL,DATA LABEL, REG
+    11 red = 1 operand,                                     2.      LABEL,DATA LABEL, REG
+    9  jmp = 1 operand,                                     2.      LABEL,            REG
+    10 bne = 1 operand,                                     2.      LABEL,            REG
+    13 jsr = 1 operand,                                     2.      LABEL,            REG
+    14 rts = 0 operand
+    15 hlt = 0 operand
     */
     switch (node->opCode)
     {
-    case 1: // cmp
+    case 1: /* cmp*/
         if (node->operandCount != 2)
         {
             printf("ERROR: In line %d - command 'cmp' should have 2 operands.\n", node->lineNum);
@@ -201,7 +197,7 @@ void validOperandPerCode(cNode node)
         }
         break;
 
-    case 0: // mov
+    case 0: /* mov*/
     case 2: // add
     case 3: // sub
         if (node->operandCount != 2)
