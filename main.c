@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
 		{
 			fileCompiling(argv[i]);
 			printf("************ Pre Assembler finished succssesfully for file %s! ************\n", argv[i]);
+			preAssemblerMatan(argv[i]); // read = matan.as , output - matan.am
 			fAssembler(argv[i]);
 			// checks if there where no errors
 			// if (errorsNodesCheck == 0)
