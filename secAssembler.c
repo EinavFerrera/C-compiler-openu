@@ -2,21 +2,26 @@
 
 int sAssembler(char *fileName, cNode headNode, lNode labelList, int codeLength, int IC, int DC)
 {
+    /*var decleration section*/
+
     char fileNameOb[MAX_LINE_SIZE];
+    FILE *outputFile;
+    char *binaryCode = (char *)malloc(sizeof(char) * 15 * codeLength); /*allocating the length of the lines for the binary code*/
+
+    /*------------------------*/
+
     strcpy(fileNameOb, fileName);
     strcat(fileNameOb, ".ob");
-    FILE *outputFile = fopen(fileNameOb, "w");
+    outputFile = fopen(fileNameOb, "w");
     if (outputFile == NULL)
     {
         printf("Failed to open the file \"%s\".\n", fileName);
-        return 1;
+        return TRUE;
     }
-    // allocating the length of the lines for the binary code
-    char *binaryCode = (char *)malloc(sizeof(char) * 15 * codeLength);
     if (binaryCode == NULL)
     {
         fprintf(stderr, "Error: Memory allocation failed.\n");
-        return false; // Return an error code
+        return FALSE; /* Return an error code*/
     }
 
     nodesToBinary(headNode, labelList, binaryCode);
@@ -33,19 +38,22 @@ int sAssembler(char *fileName, cNode headNode, lNode labelList, int codeLength, 
     }
     free(binaryCode);
     fclose(outputFile);
-    return 1;
+    return TRUE;
 }
-
 int nodesToBinary(cNode headNode, lNode labelList, char *binaryCode)
 {
     char addressAsStr[sizeof(char) * 5] = {"100"};
     char tempNumToStr[15] = {'\0'};
     cNode temp = searchNode(headNode, addressAsStr, LABLE_ADDRESS_LINE);
+    int i = 0;
+    int p = 0;
+    int j = 0;
+
     while (temp != NULL)
     {
         if (temp->lineType == CODE)
         {
-            int i = 0;
+            i = 0;
             for (i = 0; i < temp->lineSize; i++)
             {
                 memset(tempNumToStr, '\0', sizeof(tempNumToStr));
@@ -55,7 +63,7 @@ int nodesToBinary(cNode headNode, lNode labelList, char *binaryCode)
                     addStrToBinaryCode(tempNumToStr, temp->opCode, 4);
                     strcat(binaryCode, tempNumToStr);
                     memset(tempNumToStr, '\0', sizeof(tempNumToStr));
-                    for (int p = 0; p < 2; p++)
+                    for (p = 0; p < 2; p++)
                     {
                         if (temp->operandCount == 1)
                         {
@@ -162,7 +170,7 @@ int nodesToBinary(cNode headNode, lNode labelList, char *binaryCode)
         }
         if (temp->lineType == DATA_STRING)
         {
-            int j = 0;
+            j = 0;
             while (j < temp->numOfWords)
             {
                 addStrToBinaryCode(tempNumToStr, temp->dataArray[j], 14);
@@ -173,7 +181,7 @@ int nodesToBinary(cNode headNode, lNode labelList, char *binaryCode)
         }
         if (temp->lineType == DATA_INT)
         {
-            int j = 0;
+            j = 0;
             while (j < temp->numOfWords)
             {
                 addStrToBinaryCode(tempNumToStr, temp->dataArray[j], 14);
@@ -186,7 +194,7 @@ int nodesToBinary(cNode headNode, lNode labelList, char *binaryCode)
         temp = searchNode(headNode, addressAsStr, LABLE_ADDRESS_LINE);
     }
     strcat(binaryCode, "\0");
-    return true;
+    return TRUE;
 }
 void addStrToBinaryCode(char *tempStr, int value, int size)
 {
@@ -210,6 +218,7 @@ void binaryToSigns(FILE *outputFile, char *binaryCode, int IC, int DC)
     int lineCounter = 0;
     char ICDCStr[5] = {'\0'};
     char tempStr[20] = {'\0'};
+
     strcat(tempStr, "  ");
     sprintf(ICDCStr, "%d", IC - 100);
     strcat(tempStr, ICDCStr);
@@ -253,7 +262,10 @@ void binaryToSigns(FILE *outputFile, char *binaryCode, int IC, int DC)
 }
 void createEntryExternFile(lNode labelList, int searchAttr, char *fileName)
 {
+    FILE *outputFile;
     char fileNameEnt[MAX_LINE_SIZE];
+    lNode temp;
+
     strcpy(fileNameEnt, fileName);
     if (searchAttr == ENTRY)
     {
@@ -268,13 +280,13 @@ void createEntryExternFile(lNode labelList, int searchAttr, char *fileName)
         printf("Error: invalid searchAttr value.\n");
         return;
     }
-    FILE *outputFile = fopen(fileNameEnt, "w");
+    outputFile = fopen(fileNameEnt, "w");
     if (outputFile == NULL)
     {
         printf("Failed to open the file \"%s\".\n", fileName);
         return;
     }
-    lNode temp = labelList;
+    temp = labelList;
     while (temp != NULL)
     {
         if (searchAttr == EXT &&

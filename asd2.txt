@@ -1,8 +1,0 @@
-asxddad
-af
-.define sxd = 3 // token = sxd, value = 3
-dfg
-sxdhy
-dtjfghd
-.define 3 = 5 // token = 3 -> ERROR! token cannot be numbers !
-

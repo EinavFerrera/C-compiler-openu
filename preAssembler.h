@@ -7,7 +7,5 @@
  * @param fileName The name of the file to be compiled.
  */
 void fileCompiling(char *fileName);
-void extractMcr(FILE *inputFile, FILE *outputFile);
-int searchMcr(char *startOfLine, bool *isMcr);
-lNode createListByAttr(cNode orgList, lNode newList, int listAttr);
+
 #endif

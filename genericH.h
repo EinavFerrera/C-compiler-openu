@@ -12,13 +12,14 @@
 
 #include "nodes.h"
 #include "preAssembler.h"
-#include "error.h"
 #include "firstAssembler.h"
 #include "secAssembler.h"
 
 enum constantsValues
 {
     NA = -1,
+    FALSE = 0,
+    TRUE = 1,
     MCR = 10,
     ENDMCR,
     NOMCR,

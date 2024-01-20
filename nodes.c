@@ -36,12 +36,19 @@ cNode createNewNode(char *line, int lineaddress, cNode *head)
 }
 void nodeInit(cNode *node, cNode *head)
 {
+	/* var decleration section */
 	char line[MAX_LINE_SIZE];
-	char tempToken[MAX_LABEL_SIZE];
-	strcpy(line, (*node)->originalLine);
-
+	char *token;
 	char *delimiters = " \t,\n";
-	char *token = strtok(line, delimiters);
+	char label[MAX_LABEL_SIZE];
+	char *bracketIndex;
+	int num = NA;
+	int index;
+
+	/*------------------------*/
+
+	strcpy(line, (*node)->originalLine);
+	token = strtok(line, delimiters);
 	while (token != NULL)
 	{
 		if (hasSpacesInWord(token))
@@ -59,10 +66,9 @@ void nodeInit(cNode *node, cNode *head)
 			return;
 		}
 
-		/* if its a starting label of the line (XYZ:)*/
+		/* if its a starting label of the line (XYZ:) */
 		if (token[strlen(token) - 1] == ':')
 		{
-			// printf("\t\t\ti am a label\n");
 			if ((*node)->labelText[0] != '\0')
 			{
 				printf("Error: In line %d - too many labels declaritions in the line\n", (*node)->lineNum);
@@ -71,58 +77,46 @@ void nodeInit(cNode *node, cNode *head)
 			}
 			strncpy((*node)->labelText, token, strlen(token) - 1);
 		}
-		// if its a code line
-		else if ((*node)->opCode == NA && codeProperties(&(*node), token)) // if its a code line sets the operandCount,optype,opImm,opReg,opLabel,numOfWords,opCode
+		/* if its a code line sets the operandCount,optype,opImm,opReg,opLabel,numOfWords,opCode */
+		else if ((*node)->opCode == NA && codeProperties(&(*node), token))
 		{
-			// printf("\t\t\ti am a CODE DECLERATION\n");
-
 			(*node)->lineType = CODE;
 		}
-		/* if its a immidiate (-4)*/
+		/* if its a immidiate (-4) */
 		else if (token[0] == '#' && (*node)->lineType == CODE)
 		{
-			// printf("\t\t\ti am a IMM\n");
-			if (atoi(token + 1) > 16382 || atoi(token + 1) < -16383)
+			if (atoi(token + 1) > 2047 || atoi(token + 1) < -2048)
 			{
-				printf("Error: In line %d - numbers should be between -16384 and 16383. \"%s\" is not a valid number\n", (*node)->lineNum, token);
+				printf("Error: In line %d - numbers should be between -2048 and 2047. \"%s\" is not a valid number\n", (*node)->lineNum, token);
 				(*node)->errorCount++;
 			}
 			(*node)->operandType[(*node)->operandCount] = IMM;
 			(*node)->operandImm[(*node)->operandCount] = atoi(token + 1);
 			(*node)->operandCount++;
 		}
-		/* if its a register (r4)*/
+		/* if its a register (r4) */
 		else if (token[0] == 'r' &&
 				 token[1] >= '0' &&
 				 token[1] <= '7' &&
 				 strlen(token) == 2 &&
 				 (*node)->lineType == CODE)
 		{
-			// printf("\t\t\ti am a REG\n");
-
 			(*node)->operandType[(*node)->operandCount] = REG;
 			(*node)->operandReg[(*node)->operandCount] = atoi(token + 1);
 			(*node)->operandCount++;
 		}
-		/* if its a data label (XYZ[3])*/
+		/* if its a data label (XYZ[3]) */
 		else if (token[strlen(token) - 1] == ']' &&
 				 strchr(token, '[') != NULL &&
 				 (*node)->lineType == CODE)
 		{
-			// printf("\t\t\ti am a DATA LABEL\n");
-
-			char label[MAX_LABEL_SIZE];
-			char *bracketIndex;
-			int num;
-			int index;
-
 			bracketIndex = strchr(token, '[');
 			index = (int)(bracketIndex - token);
 			strncpy(label, token, index);
 			label[index] = '\0';
 			num = atoi(token + index + 1);
 
-			if (label != NULL && num != NULL)
+			if (label[0] != '\0' && num != NA)
 			{
 				(*node)->operandType[(*node)->operandCount] = DATA_LABEL;
 				strcpy((*node)->operandLabel[(*node)->operandCount], label);
@@ -130,7 +124,7 @@ void nodeInit(cNode *node, cNode *head)
 				(*node)->operandCount++;
 			}
 		}
-		/* if its a opLabel (XYZ)*/
+		/* if its a opLabel (XYZ) */
 		else if (strlen(token) <= MAX_LABEL_SIZE &&
 				 isalpha(token[0]) &&
 				 (*node)->lineType == CODE)
@@ -141,25 +135,21 @@ void nodeInit(cNode *node, cNode *head)
 				(*node)->errorCount++;
 				return;
 			}
-			// printf("\t\t\ti am a opLabel\n");
 			(*node)->operandType[(*node)->operandCount] = LABEL;
 			strcpy((*node)->operandLabel[(*node)->operandCount], token);
 			(*node)->operandCount++;
 		}
-		// if its data/ent/ext label
-		else if (token[0] == '.') // sets the lineType = DATA/EXT/ENT
+		/*if its data/ent/ext label sets the lineType = DATA/EXT/ENT*/
+		else if (token[0] == '.')
 		{
-			// printf("\t\t\ti am a DATA DECLERATION\n");
 			typeProperties(&(*node), token);
 			if ((*node)->lineType == DATA_INT)
 			{
-				// printf("\t\t\ti am a DATA_INT\n");
 				insertDataIntNode(&(*node), strtok(NULL, "\n"));
 				return;
 			}
 			else if ((*node)->lineType == DATA_STRING)
 			{
-				// printf("\t\t\ti am a DATA_STRING\n");
 				insertDataStringNode(&(*node), strtok(NULL, "\""));
 				if (strtok(NULL, "\n") != NULL)
 				{
@@ -171,8 +161,6 @@ void nodeInit(cNode *node, cNode *head)
 			}
 			else if ((*node)->lineType == ENTRY)
 			{
-				// printf("\t\t\ti am a ENTRY line\n");
-				char label[MAX_LABEL_SIZE];
 				strcpy(label, strtok(NULL, " \t\n"));
 				if (commasCounter((*node)->originalLine) > 0)
 				{
@@ -193,8 +181,6 @@ void nodeInit(cNode *node, cNode *head)
 			}
 			else if ((*node)->lineType == EXT)
 			{
-				// printf("\t\t\ti am a EXT line\n");
-				char label[MAX_LABEL_SIZE];
 				strcpy(label, strtok(NULL, " \t\n"));
 				if (commasCounter((*node)->originalLine) > 0)
 				{
@@ -214,7 +200,7 @@ void nodeInit(cNode *node, cNode *head)
 				return;
 			}
 		}
-		// if its a data line
+		/*if its a data line*/
 		else
 		{
 			if (!strcmp(token, "\0"))
@@ -228,7 +214,7 @@ void nodeInit(cNode *node, cNode *head)
 			return;
 		}
 
-		// if past code and linetype is code
+		/* if past code and linetype is code*/
 		if ((*node)->lineType == CODE)
 		{
 			token = strtok(NULL, ",\n");
@@ -275,99 +261,99 @@ int codeProperties(cNode *node, char *token)
 	{
 		(*node)->opCode = 0;
 		(*node)->lineSize = 2;
-		return true;
+		return TRUE;
 	}
 	else if (strcmp(token, "cmp") == 0)
 	{
 		(*node)->opCode = 1;
 		(*node)->lineSize = 2;
-		return true;
+		return TRUE;
 	}
 	else if (strcmp(token, "add") == 0)
 	{
 		(*node)->opCode = 2;
 		(*node)->lineSize = 2;
-		return true;
+		return TRUE;
 	}
 	else if (strcmp(token, "sub") == 0)
 	{
 		(*node)->opCode = 3;
 		(*node)->lineSize = 2;
-		return true;
+		return TRUE;
 	}
 	else if (strcmp(token, "not") == 0)
 	{
 		(*node)->opCode = 4;
 		(*node)->lineSize = 2;
-		return true;
+		return TRUE;
 	}
 	else if (strcmp(token, "clr") == 0)
 	{
 		(*node)->opCode = 5;
 		(*node)->lineSize = 1;
-		return true;
+		return TRUE;
 	}
 	else if (strcmp(token, "lea") == 0)
 	{
 		(*node)->opCode = 6;
 		(*node)->lineSize = 1;
-		return true;
+		return TRUE;
 	}
 	else if (strcmp(token, "inc") == 0)
 	{
 		(*node)->opCode = 7;
 		(*node)->lineSize = 1;
-		return true;
+		return TRUE;
 	}
 	else if (strcmp(token, "dec") == 0)
 	{
 		(*node)->opCode = 8;
 		(*node)->lineSize = 1;
-		return true;
+		return TRUE;
 	}
 	else if (strcmp(token, "jmp") == 0)
 	{
 		(*node)->opCode = 9;
 		(*node)->lineSize = 1;
-		return true;
+		return TRUE;
 	}
 	else if (strcmp(token, "bne") == 0)
 	{
 		(*node)->opCode = 10;
 		(*node)->lineSize = 1;
-		return true;
+		return TRUE;
 	}
 	else if (strcmp(token, "red") == 0)
 	{
 		(*node)->opCode = 11;
 		(*node)->lineSize = 1;
-		return true;
+		return TRUE;
 	}
 	else if (strcmp(token, "prn") == 0)
 	{
 		(*node)->opCode = 12;
 		(*node)->lineSize = 1;
-		return true;
+		return TRUE;
 	}
 	else if (strcmp(token, "jsr") == 0)
 	{
 		(*node)->opCode = 13;
 		(*node)->lineSize = 1;
-		return true;
+		return TRUE;
 	}
 	else if (strcmp(token, "rts") == 0)
 	{
 		(*node)->opCode = 14;
 		(*node)->lineSize = 0;
-		return true;
+		return TRUE;
 	}
 	else if (strcmp(token, "hlt") == 0)
 	{
 		(*node)->opCode = 15;
 		(*node)->lineSize = 0;
-		return true;
+		return TRUE;
 	}
-	return false;
+	return FALSE;
 }
 void printLoop(cNode head)
 {
@@ -388,6 +374,7 @@ void printListLoop(lNode head)
 }
 void printNode(cNode node)
 {
+	int i;
 	if (node == NULL)
 	{
 		printf("node is null\n");
@@ -414,7 +401,7 @@ void printNode(cNode node)
 	printf("lineSize: %d\n", node->lineSize);
 	printf("errorCount: %d\n", node->errorCount);
 	printf("numOfWords: %d\n", node->numOfWords);
-	for (int i = 0; i < node->numOfWords; i++)
+	for (i = 0; i < node->numOfWords; i++)
 	{
 		if (node->lineType == DATA_STRING)
 		{
@@ -429,10 +416,10 @@ void printNode(cNode node)
 }
 void insertDataIntNode(cNode *node, char *token)
 {
-	// printf("\t\t\ti am a DATA_INT handler\n");
+	int numOfCommas;
 	(*node)->numOfWords = 0;
 	token = strtok(token, ",\n");
-	int numOfCommas = commasCounter((*node)->originalLine);
+	numOfCommas = commasCounter((*node)->originalLine);
 	while (token != NULL)
 	{
 		(*node)->dataArray = (int *)realloc((*node)->dataArray, sizeof(int) * ((*node)->numOfWords + 1));
@@ -442,9 +429,9 @@ void insertDataIntNode(cNode *node, char *token)
 			(*node)->errorCount++;
 		}
 		clearAllBlanks(token);
-		if (atoi(token) > 16382 || atoi(token) < -16383)
+		if (atoi(token) > 2047 || atoi(token) < -2048) /* the max number can 12 bits represent in 2' complement*/
 		{
-			printf("Error: In line %d - numbers should be between -16384 and 16383. \"%s\" is not a valid number\n", (*node)->lineNum, token);
+			printf("Error: In line %d - numbers should be between -2048 and 2047. \"%s\" is not a valid number\n", (*node)->lineNum, token);
 			(*node)->errorCount++;
 		}
 
@@ -468,16 +455,17 @@ void insertDataIntNode(cNode *node, char *token)
 }
 void insertDataStringNode(cNode *node, char *token)
 {
-	// printf("\t\t\ti am a DATA_String handler\n");
+	int strLength;
+	int i;
 	(*node)->numOfWords = 0;
-	int strLength = strlen(token);
+	strLength = strlen(token);
 	if (!isOnlyAlpha(token))
 	{
 		printf("Error: In line %d - only characters are allowed in .string memory allocation. \"%s\" has unvalid character\n", (*node)->lineNum, token);
 		(*node)->errorCount++;
 		return;
 	}
-	for (int i = 0; i < strLength; i++)
+	for (i = 0; i < strLength; i++)
 	{
 		(*node)->dataArray = (int *)realloc((*node)->dataArray, sizeof(int) * ((*node)->numOfWords + 1));
 		(*node)->dataArray[i] = token[i];
@@ -487,8 +475,7 @@ void insertDataStringNode(cNode *node, char *token)
 	(*node)->dataArray[i] = '\0';
 	(*node)->numOfWords++;
 
-	(*node)
-		->lineSize = (*node)->numOfWords;
+	(*node)->lineSize = (*node)->numOfWords;
 }
 int isOnlyDigit(char *token)
 {
@@ -502,12 +489,12 @@ int isOnlyDigit(char *token)
 		}
 		if (!isdigit(token[i]))
 		{
-			return false;
+			return FALSE;
 		}
 		i++;
 	}
 
-	return true;
+	return TRUE;
 }
 int isOnlyAlpha(char *token)
 {
@@ -516,11 +503,11 @@ int isOnlyAlpha(char *token)
 	{
 		if (!isalpha(token[i]) && token[i] != ' ' && token[i] != '\t')
 		{
-			return false;
+			return FALSE;
 		}
 		i++;
 	}
-	return true;
+	return TRUE;
 }
 void setNextNode(cNode node, cNode nextNode)
 {
@@ -555,11 +542,11 @@ int hasSpacesInWord(char *line)
 	{
 		if (line[i] != ' ' && line[i] != '\t')
 		{
-			return true;
+			return TRUE;
 		}
 		i++;
 	}
-	return false;
+	return FALSE;
 }
 void clearDuplicateBlankChars(char *line, char *newLine)
 {
@@ -569,7 +556,8 @@ void clearDuplicateBlankChars(char *line, char *newLine)
 	while (line[i] != '\0')
 	{
 
-		if (line[i] != ' ' && line[i] != '\t' || ((line[i] == ' ' && line[i - 1] != ' ') && (line[i] == ' ' && line[i - 1] != '\t')) ||
+		if ((line[i] != ' ' && line[i] != '\t') ||
+			((line[i] == ' ' && line[i - 1] != ' ') && (line[i] == ' ' && line[i - 1] != '\t')) ||
 			((line[i] == '\t' && line[i - 1] != '\t') &&
 			 (line[i] == '\t' && line[i - 1] != ' ')))
 

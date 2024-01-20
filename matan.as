@@ -9,6 +9,6 @@ sub #18, r7
 cmp  #123,bnana
 YOYO: .string "BBCasd"
 BABA143: .string "ABC as    t"
-g: .data     5 ,    -16381 , +987
+g: .data     5 ,    -2046 , +987
 .extern bnana
 .extern asdfg

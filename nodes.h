@@ -1,5 +1,4 @@
 typedef struct contentNode *cNode; /*definition of pointer to generic struct*/
-typedef struct mcrNode *mNode;
 typedef struct listNode *lNode;
 
 typedef struct contentNode
@@ -25,13 +24,6 @@ typedef struct contentNode
     cNode next;                           /*pointer to the next node in list*/
 } contentNode_object;
 
-typedef struct mcrNode
-{
-    char name[MAX_LINE_SIZE]; /*name of the macro*/
-    char *mcrContent;         /*pointer to the macro content*/
-    struct mcrNode *next;
-} mcr_object;
-
 typedef struct listNode
 {
     char name[MAX_LABEL_SIZE]; /*name of the macro*/
@@ -44,22 +36,129 @@ typedef struct listNode
     lNode next;
 } list_object;
 
-// mNode createNewMcrNode(char *name, char *content, mNode *head);
+/**
+ * Creates a new node with the given line and line address.
+ *
+ * @param line The original line from the file.
+ * @param lineaddress The line number in the original file.
+ * @param head Pointer to the head of the list.
+ * @return The newly created node.
+ */
 cNode createNewNode(char *line, int lineaddress, cNode *head);
+
+/**
+ * Initializes the given node and sets its next node to the head of the list.
+ *
+ * @param node Pointer to the node to be initialized.
+ * @param head Pointer to the head of the list.
+ */
 void nodeInit(cNode *node, cNode *head);
+
+/**
+ * Sets the type properties of the given node based on the given token.
+ *
+ * @param node Pointer to the node.
+ * @param token The token representing the type of the instruction.
+ */
 void typeProperties(cNode *node, char *token);
+
+/**
+ * Sets the code properties of the given node based on the given token.
+ *
+ * @param node Pointer to the node.
+ * @param token The token representing the operation code.
+ * @return The number of operands in the line for CODE.
+ */
 int codeProperties(cNode *node, char *token);
+
+/**
+ * Prints the details of the given node.
+ *
+ * @param node The node to be printed.
+ */
 void printNode(cNode node);
+
+/**
+ * Prints the details of all nodes in the list starting from the given head.
+ *
+ * @param head The head of the list.
+ */
 void printListLoop(lNode head);
+
+/**
+ * Prints the details of all nodes in the list starting from the given head.
+ *
+ * @param head The head of the list.
+ */
 void printLoop(cNode head);
+
+/**
+ * Inserts a data integer node with the given token into the given node.
+ *
+ * @param node Pointer to the node.
+ * @param token The token representing the data integer.
+ */
 void insertDataIntNode(cNode *node, char *token);
+
+/**
+ * Inserts a data string node with the given token into the given node.
+ *
+ * @param node Pointer to the node.
+ * @param token The token representing the data string.
+ */
 void insertDataStringNode(cNode *node, char *token);
+
+/**
+ * Checks if the given token contains only digits.
+ *
+ * @param token The token to be checked.
+ * @return 1 if the token contains only digits, 0 otherwise.
+ */
 int isOnlyDigit(char *token);
+
+/**
+ * Checks if the given token contains only alphabetic characters.
+ *
+ * @param token The token to be checked.
+ * @return 1 if the token contains only alphabetic characters, 0 otherwise.
+ */
 int isOnlyAlpha(char *token);
-void addNode(cNode head, cNode node);
+
+/**
+ * Sets the next node of the given node to the given next node.
+ *
+ * @param node The node.
+ * @param nextNode The next node.
+ */
 void setNextNode(cNode node, cNode nextNode);
+
+/**
+ * Counts the number of commas in the given line.
+ *
+ * @param line The line to be checked.
+ * @return The number of commas in the line.
+ */
 int commasCounter(char *line);
+
+/**
+ * Clears duplicate blank characters in the given line and stores the result in newLine.
+ *
+ * @param line The line to be cleared.
+ * @param newLine The cleared line without duplicate blank characters.
+ */
 void clearDuplicateBlankChars(char *line, char *newLine);
+
+/**
+ * Checks if the given line has spaces within a word.
+ *
+ * @param line The line to be checked.
+ * @return 1 if the line has spaces within a word, 0 otherwise.
+ */
 int hasSpacesInWord(char *line);
-char *clearHeadAndTailBlanks(char *line);
+
+/**
+ * Clears all blank characters in the given line.
+ *
+ * @param line The line to be cleared.
+ */
 void clearAllBlanks(char *line);
