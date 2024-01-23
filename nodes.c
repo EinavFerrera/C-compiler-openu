@@ -29,8 +29,7 @@ cNode createNewNode(char *line, int lineaddress, cNode *head)
 	newNode->errorCount = 0;
 	newNode->numOfWords = NA;
 	newNode->lineSize = NA;
-	newNode->dataArray = (int *)malloc(sizeof(int));
-	newNode->dataArray[0] = '\0';
+	newNode->dataArray = (int *)calloc(1, sizeof(int));
 	newNode->commaErrorFlag = 0;
 	newNode->next = *head;
 	*head = newNode;
