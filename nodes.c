@@ -40,7 +40,7 @@ void nodeInit(cNode *node, cNode *head)
 	/* var decleration section */
 	char line[MAX_LINE_SIZE];
 	char *token;
-	char *delimiters = " \t,\n";
+	char *delimiters = " \t,\n\r";
 	char label[MAX_LABEL_SIZE];
 	char *bracketIndex;
 	int num = NA;
@@ -54,7 +54,7 @@ void nodeInit(cNode *node, cNode *head)
 	{
 		if (hasSpacesInWord(token))
 		{
-			printf("what is going on??\n%d\n_%s_\n",  (*node)->lineNum,token);
+			printf("%d _%s_\n}", (*node)->lineNum, token);
 			printf("Error: In line %d - \"%s\" is not a valid label, a comma may have been missing\n", (*node)->lineNum, token);
 			(*node)->errorCount++;
 			return;
