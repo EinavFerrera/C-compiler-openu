@@ -54,6 +54,7 @@ void nodeInit(cNode *node, cNode *head)
 	{
 		if (hasSpacesInWord(token))
 		{
+			printf("what is going on??\n%d\n_%s_\n",  (*node)->lineNum,token);
 			printf("Error: In line %d - \"%s\" is not a valid label, a comma may have been missing\n", (*node)->lineNum, token);
 			(*node)->errorCount++;
 			return;
