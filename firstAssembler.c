@@ -549,7 +549,6 @@ lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int 
 {
     cNode newTempNode;
     int i = 0;
-    int counter = 0;
     lNode newListNode;
     for (i = 0; i < numOfAttr; i++)
     {
@@ -557,7 +556,6 @@ lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int 
         while (temp != NULL)
         {
             newListNode = (lNode)malloc(sizeof(list_object));
-            printf("%d\n", counter++);
             memset(newListNode->name, '\0', MAX_LABEL_SIZE);
             newListNode->lineNumber = 0;
             newListNode->declarationError = 0;
@@ -955,7 +953,6 @@ void freeAll(cNode headNode, lNode labelList)
     }
     while (tempL != NULL)
     {
-        printf("1\n");
         labelList = tempL->next;
         free(tempL);
         tempL = labelList;
