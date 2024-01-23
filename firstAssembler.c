@@ -1,4 +1,12 @@
 #include "genericH.h"
+void printAsInt(char *line)
+{
+    int i = 0;
+    for (i = 0; i < strlen(line); i++)
+    {
+        printf("%d ", line[i]);
+    }
+}
 
 int fAssembler(char *fileName)
 {
@@ -31,12 +39,15 @@ int fAssembler(char *fileName)
     }
     while (fgets(line, sizeof(line), inputFile))
     {
-        newNode = createNewNode(line, lineCounter, &headNode);
-        nodeInit(&newNode, &headNode);
-        if (newNode->lineType == CODE)
-        {
-            validOperandPerCode(newNode);
-        }
+        printf("%d\t", lineCounter);
+        printAsInt(line);
+        printf("\n");
+        /*        newNode = createNewNode(line, lineCounter, &headNode);
+                nodeInit(&newNode, &headNode);
+                if (newNode->lineType == CODE)
+                {
+                    validOperandPerCode(newNode);
+                }*/
         lineCounter++;
     }
     printf("\t\t\t\t\t\t\t\t\t************ code to nodes finished for file %s! \n", fileName);
