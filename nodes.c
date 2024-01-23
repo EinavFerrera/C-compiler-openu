@@ -29,7 +29,7 @@ cNode createNewNode(char *line, int lineaddress, cNode *head)
 	newNode->errorCount = 0;
 	newNode->numOfWords = NA;
 	newNode->lineSize = NA;
-	newNode->dataArray = (int *)calloc(1, sizeof(int));
+	newNode->dataArray = NULL;
 	newNode->commaErrorFlag = 0;
 	newNode->next = *head;
 	*head = newNode;
@@ -421,6 +421,7 @@ void insertDataIntNode(cNode *node, char *token)
 	(*node)->numOfWords = 0;
 	token = strtok(token, ",\n");
 	numOfCommas = commasCounter((*node)->originalLine);
+	(*node)->dataArray = (int *)malloc(0);
 	while (token != NULL)
 	{
 		(*node)->dataArray = (int *)realloc((*node)->dataArray, sizeof(int) * ((*node)->numOfWords + 1));
@@ -460,6 +461,7 @@ void insertDataStringNode(cNode *node, char *token)
 	int i;
 	(*node)->numOfWords = 0;
 	strLength = strlen(token);
+	(*node)->dataArray = (int *)malloc(0);
 	if (!isOnlyAlpha(token))
 	{
 		printf("Error: In line %d - only characters are allowed in .string memory allocation. \"%s\" has unvalid character\n", (*node)->lineNum, token);
