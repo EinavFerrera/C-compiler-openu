@@ -14,15 +14,15 @@ cNode createNewNode(char *line, int lineaddress, cNode *head)
 	newNode->lineType = NA;
 	newNode->opCode = NA;
 	newNode->operandCount = 0;
-	newNode->labelText[0] = '\0';
+	memset(newNode->labelText, '\0', MAX_LABEL_SIZE);
 	newNode->operandType[0] = NA;
 	newNode->operandType[1] = NA;
 	newNode->operandImm[0] = NA;
 	newNode->operandImm[1] = NA;
 	newNode->operandReg[0] = NA;
 	newNode->operandReg[1] = NA;
-	newNode->operandLabel[0][0] = '\0';
-	newNode->operandLabel[1][0] = '\0';
+	memset(newNode->operandLabel[0], '\0', MAX_LABEL_SIZE);
+	memset(newNode->operandLabel[1], '\0', MAX_LABEL_SIZE);
 	newNode->targetLabelAdd[0] = NA;
 	newNode->targetLabelAdd[1] = NA;
 	newNode->ARE = NA;
