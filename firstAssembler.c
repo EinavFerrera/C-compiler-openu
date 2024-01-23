@@ -570,6 +570,10 @@ lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int 
             {
                 if (listAttr[i] == LABEL_TEXT && (newTempNode->labelText[0] != '\0'))
                 {
+                    if (newTempNode->labelText[0] == '\0')
+                    {
+                        printf("\t\t 0 found it !\n");
+                    }
                     strcpy(newListNode->name, newTempNode->labelText);
                     newListNode->declarationError = 1;
                     newListNode->mainType = DECLERATION;
@@ -587,6 +591,10 @@ lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int 
                 else if (
                     (listAttr[i] == OPERAND_TYPE_1) && ((newTempNode->operandType[0] == LABEL) || (newTempNode->operandType[0] == DATA_LABEL)))
                 {
+                    if (newTempNode->operandLabel[0][0] == '\0')
+                    {
+                        printf("\t\t 1 found it !\n");
+                    }
                     strcpy(newListNode->name, newTempNode->operandLabel[0]);
                     newListNode->declarationError = 0;
                     newListNode->mainType = USED_LABEL;
@@ -600,6 +608,10 @@ lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int 
                 else if (
                     (listAttr[i] == OPERAND_TYPE_2) && ((newTempNode->operandType[1] == LABEL) || (newTempNode->operandType[1] == DATA_LABEL)))
                 {
+                    if (newTempNode->operandLabel[1][0] == '\0')
+                    {
+                        printf("\t\t 2 found it !\n");
+                    }
                     strcpy(newListNode->name, newTempNode->operandLabel[1]);
                     newListNode->declarationError = 0;
                     newListNode->mainType = USED_LABEL;
@@ -616,6 +628,10 @@ lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int 
                 }
                 else if ((listAttr[i] == LINE_TYPE) && (newTempNode->lineType == ENTRY))
                 {
+                    if (newTempNode->operandLabel[0][0] == '\0')
+                    {
+                        printf("\t\t 3 found it !\n");
+                    }
                     strcpy(newListNode->name, newTempNode->operandLabel[0]);
                     newListNode->declarationError = 0;
                     newListNode->mainType = USED_LABEL;
@@ -623,6 +639,10 @@ lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int 
                 }
                 else if ((listAttr[i] == LINE_TYPE) && (newTempNode->lineType == EXT))
                 {
+                    if (newTempNode->operandLabel[0][0] == '\0')
+                    {
+                        printf("\t\t 4 found it !\n");
+                    }
                     strcpy(newListNode->name, newTempNode->operandLabel[0]);
                     newListNode->declarationError = 1;
                     newListNode->mainType = DECLERATION;
