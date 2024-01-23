@@ -10,14 +10,21 @@
 int fAssembler(char *fileName);
 
 /**
- * Searches for a node in the given list with the specified target and source attribute.
+ * removes the /r that is added on UBUNTU
  *
- * @param head The head node of the list.
- * @param target The target to search for as a string.
- * @param srcAttr The source attribute to match as an integer.
- * @return Returns a pointer to the found node, or NULL if not found.
+ * @param line The line to remove the /r from.
  */
-cNode searchNode(cNode head, char *target, int srcAttr);
+void removeCarrigeReturn(char *line)
+
+    /**
+     * Searches for a node in the given list with the specified target and source attribute.
+     *
+     * @param head The head node of the list.
+     * @param target The target to search for as a string.
+     * @param srcAttr The source attribute to match as an integer.
+     * @return Returns a pointer to the found node, or NULL if not found.
+     */
+    cNode searchNode(cNode head, char *target, int srcAttr);
 
 /**
  * Creates a new labels list based on the original list and the given attributes.

@@ -1,12 +1,4 @@
 #include "genericH.h"
-void printAsInt(char *line)
-{
-    int i = 0;
-    for (i = 0; i < strlen(line); i++)
-    {
-        printf("%d ", line[i]);
-    }
-}
 
 int fAssembler(char *fileName)
 {
@@ -14,7 +6,7 @@ int fAssembler(char *fileName)
     char fileNameAm[MAX_LINE_SIZE];
     FILE *inputFile;
 
-    char line[MAX_LINE_SIZE];
+    char line[MAX_LINE_SIZE] = {0};
     int lineCounter = 1;
     cNode headNode = NULL;
     cNode newNode;
@@ -39,16 +31,15 @@ int fAssembler(char *fileName)
     }
     while (fgets(line, sizeof(line), inputFile))
     {
-        printf("%d\t", lineCounter);
-        printAsInt(line);
-        printf("\n");
-        /*        newNode = createNewNode(line, lineCounter, &headNode);
-                nodeInit(&newNode, &headNode);
-                if (newNode->lineType == CODE)
-                {
-                    validOperandPerCode(newNode);
-                }*/
+        removeCarrigeReturn(line);
+        newNode = createNewNode(line, lineCounter, &headNode);
+        nodeInit(&newNode, &headNode);
+        if (newNode->lineType == CODE)
+        {
+            validOperandPerCode(newNode);
+        }
         lineCounter++;
+        memset(line, 0, sizeof(line));
     }
     printf("\t\t\t\t\t\t\t\t\t************ code to nodes finished for file %s! \n", fileName);
     if (searchNode(headNode, "", ERROR_COUNT) != NULL)
@@ -77,6 +68,19 @@ int fAssembler(char *fileName)
     sAssembler(fileName, headNode, labelList, IC + DC, IC, DC);
     freeAll(headNode, labelList);
     return FALSE;
+}
+void removeCarrigeReturn(char *line)
+{
+    int i = 0;
+    for (i = 0; i < strlen(line); i++)
+    {
+        if (line[i] == 13)
+        {
+            line[i] = 10;
+            line[i + 1] = 0;
+            return;
+        }
+    }
 }
 void numOfLinesAssign(cNode headNode, int *IC, int *DC)
 {
