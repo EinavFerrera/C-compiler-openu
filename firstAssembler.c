@@ -556,14 +556,13 @@ lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int 
         while (temp != NULL)
         {
             newListNode = (lNode)malloc(sizeof(list_object));
-            newListNode->name = (char *)malloc(1);
+            memset(newListNode->name, '\0', MAX_LABEL_SIZE);
             newTempNode = searchNode(temp, "", listAttr[i]);
 
             if (newTempNode != NULL)
             {
                 if (listAttr[i] == LABEL_TEXT && (newTempNode->labelText[0] != '\0'))
                 {
-                    newListNode->name = (char *)realloc(newListNode->name, strlen(newTempNode->labelText));
                     strcpy(newListNode->name, newTempNode->labelText);
                     newListNode->declarationError = 1;
                     newListNode->mainType = DECLERATION;
@@ -581,7 +580,6 @@ lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int 
                 else if (
                     (listAttr[i] == OPERAND_TYPE_1) && ((newTempNode->operandType[0] == LABEL) || (newTempNode->operandType[0] == DATA_LABEL)))
                 {
-                    newListNode->name = (char *)realloc(newListNode->name, strlen(newTempNode->operandLabel[0]));
                     strcpy(newListNode->name, newTempNode->operandLabel[0]);
                     newListNode->declarationError = 0;
                     newListNode->mainType = USED_LABEL;
@@ -595,7 +593,6 @@ lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int 
                 else if (
                     (listAttr[i] == OPERAND_TYPE_2) && ((newTempNode->operandType[1] == LABEL) || (newTempNode->operandType[1] == DATA_LABEL)))
                 {
-                    newListNode->name = (char *)realloc(newListNode->name, strlen(newTempNode->operandLabel[1]));
                     strcpy(newListNode->name, newTempNode->operandLabel[1]);
                     newListNode->declarationError = 0;
                     newListNode->mainType = USED_LABEL;
@@ -612,7 +609,6 @@ lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int 
                 }
                 else if ((listAttr[i] == LINE_TYPE) && (newTempNode->lineType == ENTRY))
                 {
-                    newListNode->name = (char *)realloc(newListNode->name, strlen(newTempNode->operandLabel[0]));
                     strcpy(newListNode->name, newTempNode->operandLabel[0]);
                     newListNode->declarationError = 0;
                     newListNode->mainType = USED_LABEL;
@@ -620,7 +616,6 @@ lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int 
                 }
                 else if ((listAttr[i] == LINE_TYPE) && (newTempNode->lineType == EXT))
                 {
-                    newListNode->name = (char *)realloc(newListNode->name, strlen(newTempNode->operandLabel[0]));
                     strcpy(newListNode->name, newTempNode->operandLabel[0]);
                     newListNode->declarationError = 1;
                     newListNode->mainType = DECLERATION;
@@ -946,7 +941,6 @@ void freeAll(cNode headNode, lNode labelList)
     while (tempL != NULL)
     {
         labelList = tempL->next;
-        free(tempL->name);
         free(tempL);
         tempL = labelList;
     }
