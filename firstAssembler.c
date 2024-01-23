@@ -86,6 +86,7 @@ void numOfLinesAssign(cNode headNode, int *IC, int *DC)
     }
     else if (temp->lineType == DATA_STRING)
     {
+
         temp->lineSize = temp->numOfWords;
         temp->lableAddressLine = (*DC);
         (*DC) += temp->lineSize;

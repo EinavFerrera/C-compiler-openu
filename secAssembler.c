@@ -6,7 +6,7 @@ int sAssembler(char *fileName, cNode headNode, lNode labelList, int codeLength, 
 
     char fileNameOb[MAX_LINE_SIZE];
     FILE *outputFile;
-    char *binaryCode = (char *)malloc(sizeof(char) * 15 * codeLength); /*allocating the length of the lines for the binary code*/
+    char *binaryCode = (char *)calloc(15 * codeLength, sizeof(char)); /*allocating the length of the lines for the binary code*/
 
     /*------------------------*/
 
