@@ -557,6 +557,13 @@ lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int 
         {
             newListNode = (lNode)malloc(sizeof(list_object));
             memset(newListNode->name, '\0', MAX_LABEL_SIZE);
+            newListNode->lineNumber = 0;
+            newListNode->declarationError = 0;
+            newListNode->mainType = NA;
+            newListNode->type = NA;
+            newListNode->address = NA;
+            newListNode->EXTUsedAddress = NA;
+
             newTempNode = searchNode(temp, "", listAttr[i]);
 
             if (newTempNode != NULL)
