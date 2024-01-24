@@ -1,45 +1,83 @@
 #include "genericH.h"
 
-void fileCompiling(char *fileName)
+void preAssembel(char *fileName)
 {
-    char outputFileName[MAX_LINE_SIZE];
-    char fileNameAs[MAX_LINE_SIZE];
-    FILE *inputFile;
-    FILE *outputFile;
-    /*Create the output file name*/
-    strcpy(outputFileName, fileName);
-    strcat(outputFileName, ".am");
+    /*
+     open file with am to write
+     open file with as to read
+     pass 1:
+        read line by line from AS
+        replace all comments and spaces
+     pass 2:
+        read line by line from AM
+        replace all macros
+     pass 3:
+        read line by line from AM
+        replace all defines
+            read line by line
+            if line is a macro
+                read macro
+                replace macro with macro content
+            if line is a define
+                add define to defines array
+            if line is already defined
+                show error
 
-    /*Open the input file*/
+    */
+    /*var decleration section*/
+    char fileNameAs[MAX_LABEL_SIZE];
+    char fileNameAm[MAX_LABEL_SIZE];
+    FILE *asFile;
+    FILE *amFile;
+    char line[MAX_LINE_SIZE] = {0};
+    int lineCounter;
+    /*------------------------*/
+    lineCounter = 0;
+
+    /* Open the src file*/
     strcpy(fileNameAs, fileName);
     strcat(fileNameAs, ".as");
-    inputFile = fopen(fileNameAs, "r");
-    if (inputFile == NULL)
+    asFile = fopen(fileNameAs, "r");
+    if (asFile == NULL)
     {
-        printf("Failed to open the file.\n");
-        return;
+        printf("Failed to open the file \"%s\".\n", fileName);
+        return TRUE;
+    }
+    /* Open the dst file*/
+    strcpy(fileNameAm, fileName);
+    strcat(fileNameAm, ".am");
+    amFile = fopen(fileNameAm, "w");
+    if (amFile == NULL)
+    {
+        printf("Failed to create new AM file \"%s\".\n", fileName);
+        return TRUE;
     }
 
-    /*Open the output file*/
-    outputFile = fopen(outputFileName, "w");
-    if (outputFile == NULL)
+    while (fgets(line, sizeof(line), asFile))
     {
-        printf("Failed to create the output file.\n");
-        fclose(inputFile);
+        if (removeCommentsAndSpaces(line)) /*if comments return 1, or replace line with single space only*/
+        {
+            continue;
+        }
+        if (replaceDefines(line))
+        { /*if define return 1 its an error*/
+            return;
+        }
+        fprintf(amFile, "%s", line);
+        memset(line, 0, sizeof(line));
+    }
+    if (processMacro(amFile))
+    {
         return;
     }
-
-    fclose(inputFile);
-    fclose(outputFile);
-    return;
 }
 
 #define MAX_LINES 1000
 #define MAX_LINE_LENGTH 100
 #define MAX_DEFINES 100 /*temp so i can make it work*/
 
-void processMacro(char *input[], int *lineCount);
-void processMacro(char *input[], int *lineCount)
+int processMacro(FILE *inputfile)
+// int processMacro(char *input[], int *lineCount)
 {
     int i;
     int j;
@@ -73,9 +111,9 @@ void processMacro(char *input[], int *lineCount)
 
 typedef struct
 {
-    char name[MAX_LINE_LENGTH]; /* array of defines*/
-    int value;                  /*define's value*/
-    int defined;                /*the flag indicate if the define is already exists*/
+    char name[MAX_LABEL_SIZE]; /* array of defines*/
+    int value;                 /*define's value*/
+    int defined;               /*the flag indicate if the define is already exists*/
 } Define;
 
 Define defines[MAX_DEFINES] = {0};
@@ -92,8 +130,7 @@ int getDefineIndex(char *name)
     }
     return -1;
 }
-
-void replaceDefines(char *text)
+int replaceDefines(char *text)
 {
     int len = strlen(text);
     int i;
@@ -102,14 +139,13 @@ void replaceDefines(char *text)
     int nameEnd;
     int equalsPos;
 
-    int j = 0; /*temp so i can make*/
+    int j = 0;
 
     for (i = 0; i < len; i++)
     {
         if (text[i] == '.' && i + 7 < len && strncmp(&text[i], ".define", 7) == 0)
         {
             nameStart = i + 8;
-
             /* Find the end of the define name*/
             nameEnd = nameStart;
             while (isalpha(text[nameEnd]))
@@ -120,13 +156,13 @@ void replaceDefines(char *text)
             if (nameStart < nameEnd)
             {
                 /*Extract the define name*/
-                char name[MAX_LINE_LENGTH];
+                char name[MAX_LABEL_SIZE];
                 strncpy(name, &text[nameStart], nameEnd - nameStart);
                 name[nameEnd - nameStart] = '\0';
 
                 /*Find the position of '='*/
                 equalsPos = nameEnd;
-                while (isspace(text[equalsPos]))
+                while ((text[equalsPos]) != 32 && (text[equalsPos]) != 9) /*32 = space, 9 = tab*/
                 {
                     equalsPos++;
                 }
@@ -135,7 +171,7 @@ void replaceDefines(char *text)
                 {
                     /*Skip whitespace after '='*/
                     equalsPos++;
-                    while (isspace(text[equalsPos]))
+                    while ((text[equalsPos]) != 32 && (text[equalsPos]) != 9)
                     {
                         equalsPos++;
                     }
@@ -144,22 +180,31 @@ void replaceDefines(char *text)
 
                     if (defineIndex == -1)
                     {
-
                         /*Define not found, add it*/
                         if (!defines[j].defined)
                         {
                             strcpy(defines[j].name, name);
-                            sscanf(&text[equalsPos], "%d", &defines[j].value);
-                            defines[j].defined = 1;
-                            break;
+                            char tempNumber[MAX_LINE_LENGTH];
+                            sscanf(&text[equalsPos], "%s", tempNumber);
+                            if (!isOnlyDigit(tempNumber))
+                            {
+                                printf("Error: Define '%s' is not a number.\n", name);
+                                break;
+                            }
+                            else
+                            {
+                                defines[j].value = atoi(tempNumber);
+                                defines[j].defined = 1;
+                                j++;
+                            }
                         }
                     }
-                }
-                else
-                {
-                    /*Define already exists, show an error*/
-                    printf("Error: Define '%s' redefined.\n", name);
-                    exit(EXIT_FAILURE);
+                    else
+                    {
+                        /*Define already exists, show an error*/
+                        printf("Error: Define '%s' redefined.\n", name);
+                        break;
+                    }
                 }
             }
         }
@@ -193,4 +238,11 @@ void replaceDefines(char *text)
             }
         }
     }
+}
+int removeCommentsAndSpaces(char *line)
+{
+    if (line[0] == ';')
+    {
+        return TRUE;
+        }
 }

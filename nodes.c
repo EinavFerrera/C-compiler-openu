@@ -556,19 +556,28 @@ void clearDuplicateBlankChars(char *line, char *newLine)
 {
 	int i = 1;
 	int j = 1;
+	while (line[i] != '\0')
+	{
+		if (line[i] == '\t')
+		{
+			line[i] == ' ';
+		}
+		i++;
+	}
 	newLine[0] = line[0];
 	while (line[i] != '\0')
 	{
+		if (line)
 
-		if ((line[i] != ' ' && line[i] != '\t') ||
-			((line[i] == ' ' && line[i - 1] != ' ') && (line[i] == ' ' && line[i - 1] != '\t')) ||
-			((line[i] == '\t' && line[i - 1] != '\t') &&
-			 (line[i] == '\t' && line[i - 1] != ' ')))
+			if ((line[i] != ' ' && line[i] != '\t') ||
+				((line[i] == ' ' && line[i - 1] != ' ') && (line[i] == ' ' && line[i - 1] != '\t')) ||
+				((line[i] == '\t' && line[i - 1] != '\t') &&
+				 (line[i] == '\t' && line[i - 1] != ' ')))
 
-		{
-			newLine[j] = line[i];
-			j++;
-		}
+			{
+				newLine[j] = line[i];
+				j++;
+			}
 		i++;
 	}
 	newLine[j] = '\0';
@@ -577,7 +586,7 @@ void clearAllBlanks(char *line)
 {
 	int i = 0;
 	int j = 0;
-	char newLine[32];
+	char newLine[MAX_LINE_SIZE];
 	while (line[i] != '\0')
 	{
 		if (line[i] != ' ' && line[i] != '\t')

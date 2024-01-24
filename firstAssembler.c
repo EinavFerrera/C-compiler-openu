@@ -22,7 +22,7 @@ int fAssembler(char *fileName)
 
     /* Open the input file*/
     strcpy(fileNameAm, fileName);
-    strcat(fileNameAm, ".as"); /* TODO: change to .am*/
+    strcat(fileNameAm, ".am"); /* TODO: change to .am*/
     inputFile = fopen(fileNameAm, "r");
     if (inputFile == NULL)
     {

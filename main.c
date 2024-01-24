@@ -16,9 +16,9 @@ int main(int argc, char *argv[])
 		int i;
 		for (i = 1; i < argc; i++)
 		{
+			preAssemblerMatan(argv[i]); /*read = xxx.as , output - xxx.am*/
 			fileCompiling(argv[i]);
 			printf("************ Pre Assembler finished successfully for file %s! ************\n", argv[i]);
-			/* preAssemblerMatan(argv[i]); read = xxx.as , output - xxx.am */
 
 			/*compiling and checks if there were no errors*/
 			if (!fAssembler(argv[i]))
