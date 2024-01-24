@@ -1,6 +1,15 @@
 #include "genericH.h"
 
-void preAssembel(char *fileName)
+typedef struct
+{
+    char name[MAX_LABEL_SIZE]; /* array of defines*/
+    int value;                 /*define's value*/
+    int defined;               /*the flag indicate if the define is already exists*/
+} Define;
+
+Define defines[MAX_DEFINES] = {0};
+
+int preAssembel(char *fileName)
 {
     /*
      open file with am to write
@@ -31,8 +40,9 @@ void preAssembel(char *fileName)
     FILE *amFile;
     char line[MAX_LINE_SIZE] = {0};
     int lineCounter;
+    int isDefineLine = 0;
     /*------------------------*/
-    lineCounter = 0;
+    lineCounter = 1;
 
     /* Open the src file*/
     strcpy(fileNameAs, fileName);
@@ -59,196 +69,238 @@ void preAssembel(char *fileName)
         {
             continue;
         }
-        //     if (replaceDefines(line))
-        //     { /*if define return 1 its an error*/
-        //         return;
-        //     }
-        //     fprintf(amFile, "%s", line);
-        //     memset(line, 0, sizeof(line));
-        // }
-        // if (processMacro(amFile))
-        // {
-        //     return;
-        // }
-        printf("%s", line);
-    }
-
-#define MAX_LINES 1000
-#define MAX_LINE_LENGTH 100
-#define MAX_DEFINES 100 /*temp so i can make it work*/
-
-    int processMacro(FILE * inputfile)
-    // int processMacro(char *input[], int *lineCount)
-    {
-        int i;
-        int j;
-        char *macroName = NULL;
-        char *macroContents[MAX_LINES];
-        int macroLineCount = 0;
-
-        for (i = 0; i < *lineCount; i++)
-        {
-            if (strncmp(input[i], "mcr", 3) == 0)
-            {
-                macroName = strtok(input[i] + 4, " ");
-                i++; /*Skip the mcr line*/
-                while (strncmp(input[i], "endmcr", 6) != 0)
-                {
-                    macroContents[macroLineCount++] = input[i++];
-                }
-            }
-            else if (macroName != NULL && strncmp(input[i], macroName, strlen(macroName)) == 0)
-            {
-                /*Replace macro invocation with macroContents*/
-                for (j = 0; j < macroLineCount; j++)
-                {
-                    input[*lineCount + j] = macroContents[j];
-                }
-                *lineCount += macroLineCount;
-                macroName = NULL; /*Reset macroName after processing*/
-            }
-        }
-    }
-
-    typedef struct
-    {
-        char name[MAX_LABEL_SIZE]; /* array of defines*/
-        int value;                 /*define's value*/
-        int defined;               /*the flag indicate if the define is already exists*/
-    } Define;
-
-    Define defines[MAX_DEFINES] = {0};
-
-    int getDefineIndex(char *name)
-    {
-        int i;
-        for (i = 0; i < MAX_DEFINES; i++)
-        {
-            if (strcmp(defines[i].name, name) == 0 && defines[i].defined)
-            {
-                return i;
-            }
-        }
-        return -1;
-    }
-    int replaceDefines(char *text)
-    {
-        int len = strlen(text);
-        int i;
-        int defineIndex;
-        int nameStart;
-        int nameEnd;
-        int equalsPos;
-
-        int j = 0;
-
-        for (i = 0; i < len; i++)
-        {
-            if (text[i] == '.' && i + 7 < len && strncmp(&text[i], ".define", 7) == 0)
-            {
-                nameStart = i + 8;
-                /* Find the end of the define name*/
-                nameEnd = nameStart;
-                while (isalpha(text[nameEnd]))
-                {
-                    nameEnd++;
-                }
-
-                if (nameStart < nameEnd)
-                {
-                    /*Extract the define name*/
-                    char name[MAX_LABEL_SIZE];
-                    strncpy(name, &text[nameStart], nameEnd - nameStart);
-                    name[nameEnd - nameStart] = '\0';
-
-                    /*Find the position of '='*/
-                    equalsPos = nameEnd;
-                    while ((text[equalsPos]) != 32 && (text[equalsPos]) != 9) /*32 = space, 9 = tab*/
-                    {
-                        equalsPos++;
-                    }
-
-                    if (text[equalsPos] == '=')
-                    {
-                        /*Skip whitespace after '='*/
-                        equalsPos++;
-                        while ((text[equalsPos]) != 32 && (text[equalsPos]) != 9)
-                        {
-                            equalsPos++;
-                        }
-
-                        defineIndex = getDefineIndex(name);
-
-                        if (defineIndex == -1)
-                        {
-                            /*Define not found, add it*/
-                            if (!defines[j].defined)
-                            {
-                                strcpy(defines[j].name, name);
-                                char tempNumber[MAX_LINE_LENGTH];
-                                sscanf(&text[equalsPos], "%s", tempNumber);
-                                if (!isOnlyDigit(tempNumber))
-                                {
-                                    printf("Error: Define '%s' is not a number.\n", name);
-                                    break;
-                                }
-                                else
-                                {
-                                    defines[j].value = atoi(tempNumber);
-                                    defines[j].defined = 1;
-                                    j++;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            /*Define already exists, show an error*/
-                            printf("Error: Define '%s' redefined.\n", name);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        if (isalpha(text[i])) /*temp so i can make it work*/
-        {
-            /*Find the end of the define name*/
-            nameEnd = i;
-            while (isalpha(text[nameEnd]))
-            {
-                nameEnd++;
-            }
-
-            if (i < nameEnd)
-            {
-                /*Extract the define name*/
-                char name[MAX_LINE_LENGTH];
-                strncpy(name, &text[i], nameEnd - i);
-                name[nameEnd - i] = '\0';
-
-                defineIndex = getDefineIndex(name);
-
-                if (defineIndex != -1)
-                {
-                    /*Replace the define with its value*/
-                    char valueStr[MAX_LINE_LENGTH];
-                    sprintf(valueStr, "%d", defines[defineIndex].value);
-                    memmove(&text[i + strlen(valueStr)], &text[nameEnd], len - nameEnd + 1);
-                    strncpy(&text[i], valueStr, strlen(valueStr));
-                    len += strlen(valueStr) - 1;
-                }
-            }
-        }
-    }
-    int removeCommentsAndSpaces(char *line)
-    {
-        if (line[0] == ';')
-        {
+        isDefineLine = replaceDefines(line, lineCounter);
+        if (isDefineLine == 1)
+        { /*if define return 1 its an error, if returns 0 = skip define line*/
             return TRUE;
         }
-        char newLine[MAX_LINE_LENGTH] = {'\0'};
-        clearDuplicateBlankChars(line, newLine);
-        memset(line, 0, MAX_LINE_LENGTH);
-        strcpy(line, newLine);
-        return FALSE;
+        else if (isDefineLine == 0)
+        {
+            memset(line, 0, sizeof(line));
+            continue;
+        }
+        fprintf(amFile, "%s", line);
+        memset(line, 0, sizeof(line));
+        lineCounter++;
     }
+    // if (processMacro(amFile))
+    // {
+    //     return;
+    // }
+
+    fclose(asFile);
+    fclose(amFile);
+}
+
+// int processMacro(FILE *inputfile)
+// // int processMacro(char *input[], int *lineCount)
+// {
+//     int i;
+//     int j;
+//     char *macroName = NULL;
+//     char *macroContents[MAX_LINES];
+//     int macroLineCount = 0;
+//     for (i = 0; i < *lineCount; i++)
+//     {
+//         if (strncmp(input[i], "mcr", 3) == 0)
+//         {
+//             macroName = strtok(input[i] + 4, " ");
+//             i++; /*Skip the mcr line*/
+//             while (strncmp(input[i], "endmcr", 6) != 0)
+//             {
+//                 macroContents[macroLineCount++] = input[i++];
+//             }
+//         }
+//         else if (macroName != NULL && strncmp(input[i], macroName, strlen(macroName)) == 0)
+//         {
+//             /*Replace macro invocation with macroContents*/
+//             for (j = 0; j < macroLineCount; j++)
+//             {
+//                 input[*lineCount + j] = macroContents[j];
+//             }
+//             *lineCount += macroLineCount;
+//             macroName = NULL; /*Reset macroName after processing*/
+//         }
+//     }
+// }
+
+int getDefineIndex(char *name)
+{
+    int i;
+    for (i = 0; i < MAX_DEFINES; i++)
+    {
+        if (strcmp(defines[i].name, name) == 0 && defines[i].defined)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+int replaceDefines(char *text, int lineNum)
+{
+    int length = strlen(text);
+    char name[MAX_LABEL_SIZE];
+    char textNum[MAX_LINE_SIZE];
+    int i = 0;
+    int p = 0;
+    int j = 0;
+    int defineCounter = 0;
+    int defineIndex = 0;
+    char tempName[MAX_LABEL_SIZE];
+    char tempNum[MAX_LINE_SIZE];
+    int hasSpace = FALSE;
+
+    while (text[i] != '\0')
+    {
+        if (i == 0 && length > 8 && strncmp(&text[i], ".define", 7) == 0 && text[i + 7] == ' ')
+        { /*legit define*/
+            i += 8;
+            while (text[i] != '\0' && text[i] != ' ' && text[i] != '=')
+            {
+                if (!isalpha(text[i]) && text[i] > 96)
+                {
+                    printf("ERROR: In line %d - Define '%s' has no valid define label.\n", lineNum, text);
+                    return TRUE;
+                }
+                name[j] = text[i];
+                i++;
+                j++;
+            }
+            if (text[i] == '\0')
+            {
+                printf("ERROR: In line %d - Define '%s' has no valid define label.\n", lineNum, text);
+                return TRUE;
+            }
+            if (text[i] == ' ')
+            {
+                i++;
+            }
+            if (text[i] == '=')
+            {
+                i++;
+                if (text[i] == ' ')
+                {
+                    i++;
+                }
+                while (text[i] != '\0' && text[i] != '\n')
+                {
+                    textNum[p] = text[i];
+                    p++;
+                    i++;
+                }
+                textNum[p] = '\0';
+                if (savedWord(textNum))
+                {
+                    printf("ERROR: In line %d - Define '%s' cannot be a saved word.\n", lineNum, text);
+                    return TRUE;
+                }
+                if (!isOnlyDigit(textNum))
+                {
+                    printf("ERROR: In line %d - Define '%s' value is not a number.\n", lineNum, text);
+                    return TRUE;
+                }
+                if (getDefineIndex(name) != -1)
+                {
+                    printf("ERROR: In line %d - Define '%s' already exists.\n", lineNum, text);
+                    return TRUE;
+                }
+                else
+                {
+                    strcpy(defines[defineCounter].name, name);
+                    defines[defineCounter].value = atoi(textNum);
+                    defines[defineCounter].defined = TRUE;
+                    defineCounter++;
+                    return FALSE;
+                }
+            }
+            else
+            {
+                printf("ERROR: In line %d - Define decleration '%s' does not contain number.\n", lineNum, text);
+                return TRUE;
+            }
+        }
+
+        else
+        {
+            while (text[i] != '\0')
+            {
+                if (text[i] == ' ' ||
+                    text[i] == '#')
+                {
+                    hasSpace = TRUE;
+                }
+                while (isalpha(text[i]))
+                {
+                    tempName[j] = text[i];
+                    i++;
+                    j++;
+                }
+                if (text[i] == ' ' ||
+                    (text[i] == ']' && text[i - j - 1] == '['))
+                {
+                    hasSpace = TRUE;
+                }
+                tempName[j] = '\0';
+                defineIndex = getDefineIndex(tempName);
+                if (defineIndex >= 0 && hasSpace)
+                {
+                    sprintf(tempNum, "%d", defines[defineIndex].value);
+                    strncat(tempNum, &text[i], strlen(&text[i] - 1));
+                    memmove(&text[i - strlen(tempName)], &tempNum, strlen(tempNum) + 1);
+                }
+                j = 0;
+                i++;
+                hasSpace = FALSE;
+            }
+        }
+        i++;
+    }
+    return 2;
+}
+int removeCommentsAndSpaces(char *line)
+{
+    char newLine[MAX_LINE_SIZE] = {'\0'};
+    if (line[0] == ';')
+    {
+        return TRUE;
+    }
+    clearDuplicateBlankChars(line, newLine);
+    memset(line, 0, MAX_LINE_SIZE);
+    strcpy(line, newLine);
+    return FALSE;
+}
+int savedWord(char *textNum)
+{
+    if (strcmp(textNum, "mov") == 0 ||
+        strcmp(textNum, "cmp") == 0 ||
+        strcmp(textNum, "add") == 0 ||
+        strcmp(textNum, "sub") == 0 ||
+        strcmp(textNum, "lea") == 0 ||
+        strcmp(textNum, "clr") == 0 ||
+        strcmp(textNum, "not") == 0 ||
+        strcmp(textNum, "inc") == 0 ||
+        strcmp(textNum, "dec") == 0 ||
+        strcmp(textNum, "jmp") == 0 ||
+        strcmp(textNum, "bne") == 0 ||
+        strcmp(textNum, "red") == 0 ||
+        strcmp(textNum, "prn") == 0 ||
+        strcmp(textNum, "jsr") == 0 ||
+        strcmp(textNum, "rts") == 0 ||
+        strcmp(textNum, "stop") == 0 ||
+        strcmp(textNum, "r0") == 0 ||
+        strcmp(textNum, "r1") == 0 ||
+        strcmp(textNum, "r2") == 0 ||
+        strcmp(textNum, "r3") == 0 ||
+        strcmp(textNum, "r4") == 0 ||
+        strcmp(textNum, "r5") == 0 ||
+        strcmp(textNum, "r6") == 0 ||
+        strcmp(textNum, "r7") == 0 ||
+        strcmp(textNum, "data") == 0 ||
+        strcmp(textNum, "string") == 0 ||
+        strcmp(textNum, "entry") == 0 ||
+        strcmp(textNum, "extern") == 0)
+    {
+        return TRUE;
+    }
+    return FALSE;
+}

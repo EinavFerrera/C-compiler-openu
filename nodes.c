@@ -564,9 +564,16 @@ void clearDuplicateBlankChars(char *line, char *newLine)
 		}
 		i++;
 	}
-	newLine[0] = line[0];
+	i = 0;
 	while (line[i] != '\0')
 	{
+		if (i == 0)
+		{
+			while (line[i] == ' ')
+			{
+				i++;
+			}
+		}
 		if (line[i] == ' ')
 		{
 			newLine[newi] = line[i];

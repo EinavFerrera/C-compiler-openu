@@ -9,6 +9,7 @@
 
 #define MAX_LINE_SIZE 81
 #define MAX_LABEL_SIZE 32
+#define MAX_DEFINES 100 /*max number of defines*/
 
 #include "nodes.h"
 #include "preAssembler.h"
