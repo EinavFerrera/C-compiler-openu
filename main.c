@@ -16,15 +16,15 @@ int main(int argc, char *argv[])
 		int i;
 		for (i = 1; i < argc; i++)
 		{
-			preAssemblerMatan(argv[i]); /*read = xxx.as , output - xxx.am*/
-			fileCompiling(argv[i]);
-			printf("************ Pre Assembler finished successfully for file %s! ************\n", argv[i]);
+			preAssembel(argv[i]); /*read = xxx.as , output - xxx.am*/
+								  // fileCompiling(argv[i]);
+								  // printf("************ Pre Assembler finished successfully for file %s! ************\n", argv[i]);
 
-			/*compiling and checks if there were no errors*/
-			if (!fAssembler(argv[i]))
-			{
-				printf("************ File \"%s\" compiled successfully! ************ \n", argv[i]);
-			}
+			// /*compiling and checks if there were no errors*/
+			// if (!fAssembler(argv[i]))
+			// {
+			// 	printf("************ File \"%s\" compiled successfully! ************ \n", argv[i]);
+			// }
 		}
 	}
 	return 0;

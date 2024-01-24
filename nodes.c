@@ -554,8 +554,8 @@ int hasSpacesInWord(char *line)
 }
 void clearDuplicateBlankChars(char *line, char *newLine)
 {
-	int i = 1;
-	int j = 1;
+	int i = 0;
+	int newi = 0;
 	while (line[i] != '\0')
 	{
 		if (line[i] == '\t')
@@ -567,20 +567,23 @@ void clearDuplicateBlankChars(char *line, char *newLine)
 	newLine[0] = line[0];
 	while (line[i] != '\0')
 	{
-		if (line)
-
-			if ((line[i] != ' ' && line[i] != '\t') ||
-				((line[i] == ' ' && line[i - 1] != ' ') && (line[i] == ' ' && line[i - 1] != '\t')) ||
-				((line[i] == '\t' && line[i - 1] != '\t') &&
-				 (line[i] == '\t' && line[i - 1] != ' ')))
-
+		if (line[i] == ' ')
+		{
+			newLine[newi] = line[i];
+			newi++;
+			while (line[i] != '\0' && line[i] == ' ')
 			{
-				newLine[j] = line[i];
-				j++;
+				i++;
 			}
-		i++;
+		}
+		else
+		{
+			newLine[newi] = line[i];
+			i++;
+			newi++;
+		}
 	}
-	newLine[j] = '\0';
+	newLine[newi] = '\0';
 }
 void clearAllBlanks(char *line)
 {
