@@ -94,8 +94,9 @@ int processMacro(char *fileName)
         }
 
         foundMacro = FALSE;
-        macroContents = (char *)malloc((MAX_LINE_SIZE + 1) * sizeof(char));
-        tempAmFile = (char *)malloc((MAX_LINE_SIZE + 1) * sizeof(char));
+        macroContents = (char *)malloc(1);
+        macroContents[0] = '\0';
+        tempAmFile = (char *)malloc(1);
         tempAmFile[0] = '\0';
         while (fgets(line, sizeof(line), amFile))
         {
@@ -124,7 +125,7 @@ int processMacro(char *fileName)
                     }
                     else
                     {
-                        macroContents = (char *)realloc(macroContents, (strlen(macroContents) + strlen(line) + 1));
+                        macroContents = (char *)realloc(macroContents, (strlen(macroContents) + strlen(line)));
                         strcat(macroContents, line);
                     }
                 }
@@ -139,12 +140,12 @@ int processMacro(char *fileName)
                       line[strlen(macroName)] == '\r' ||
                       line[strlen(macroName)] == '\0'))
             {
-                tempAmFile = (char *)realloc(tempAmFile, (strlen(tempAmFile) + strlen(macroContents) + 1));
+                tempAmFile = (char *)realloc(tempAmFile, (strlen(tempAmFile) + strlen(macroContents)));
                 strcat(tempAmFile, macroContents);
             }
             else
             {
-                tempAmFile = (char *)realloc(tempAmFile, (strlen(tempAmFile) + strlen(line) + 1));
+                tempAmFile = (char *)realloc(tempAmFile, (strlen(tempAmFile) + strlen(line)));
                 strcat(tempAmFile, line);
             }
         }
