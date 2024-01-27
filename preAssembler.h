@@ -1,11 +1,14 @@
 #ifndef preAssembler
 #define preAssembler
+typedef struct defineNode *dNode;
 
-typedef struct
+typedef struct defineNode
 {
     char name[MAX_LABEL_SIZE]; /* array of defines*/
     int value;                 /*define's value*/
     int defined;               /*the flag indicate if the define is already exists*/
+    dNode next;                /*pointer to the next node in list*/
+
 } Define;
 
 /**
@@ -29,9 +32,9 @@ int processMacro(char *fileName);
  *
  * @param name The name of the define.
  * @param defineCounter The number of defines already made.
- * @return The index of the define if found, -1 otherwise.
+ * @return The node of the define if found, NULL otherwise.
  */
-int getDefineIndex(char *name, int defineCounter, Define *defines);
+dNode getDefineIndex(char *name, int defineCounter, dNode defines);
 
 /**
  * Replaces the defines in the given text.
@@ -41,7 +44,7 @@ int getDefineIndex(char *name, int defineCounter, Define *defines);
  * @param defineCounter The number of defines already made.
  * @return 1 if found an error, 0 if found a define decleration, 2 if found an define use that have been replaced.
  */
-int replaceDefines(char *text, int lineNum, int *counter, Define *defines);
+int replaceDefines(char *text, int lineNum, int *counter, dNode defines);
 
 /**
  * Removes comments and spaces from the given line.
@@ -60,11 +63,17 @@ int removeCommentsAndSpaces(char *line);
 int savedWord(char *token);
 
 /**
- * S.
+ * Initializes the array of defines starting from the given index.
  *
- * @param defines pointer to the array.
- * @param defineCounter the index in the array to initiate.
+ * @param defines Pointer to the array of defines.
  */
-void initDefine(Define *defines, int defineCounter);
+void initDefine(dNode defines);
+
+/**
+ * Frees the memory allocated for a linked list of defines.
+ *
+ * @param defines The head of the linked list of defines.
+ */
+void freeDefines(dNode defines);
 
 #endif

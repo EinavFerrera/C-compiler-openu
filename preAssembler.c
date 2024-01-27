@@ -11,7 +11,7 @@ int preAssembel(char *fileName)
     int lineCounter;
     int isDefineLine = 0;
     int defineCounter = 0;
-    Define *defines;
+    dNode *defines = NULL;
 
     /*------------------------*/
     lineCounter = 1;
@@ -35,8 +35,8 @@ int preAssembel(char *fileName)
         return TRUE;
     }
 
-    defines = (Define *)malloc(sizeof(Define));
-    initDefine(defines, 0);
+    defines = (dNode)malloc(sizeof(Define));
+    initDefine(defines);
 
     while (fgets(line, sizeof(line), asFile))
     {
@@ -46,15 +46,16 @@ int preAssembel(char *fileName)
             continue;
         }
         isDefineLine = replaceDefines(line, lineCounter, &defineCounter, defines);
+
         if (isDefineLine == 1)
         { /*if define return 1 its an error, if returns 0 = skip define line*/
-            free(defines);
+            freeDefines(defines);
             return TRUE;
         }
         else if (isDefineLine == 0)
         {
             defines = (Define *)malloc((defineCounter) * sizeof(Define));
-            initDefine(defines, defineCounter);
+            initDefine(defines);
             memset(line, 0, sizeof(line));
             continue;
         }
@@ -62,7 +63,7 @@ int preAssembel(char *fileName)
         memset(line, 0, sizeof(line));
         lineCounter++;
     }
-    free(defines);
+    freeDefines(defines);
     fclose(asFile);
     fclose(amFile);
     if (processMacro(fileName))
@@ -171,19 +172,20 @@ int processMacro(char *fileName)
     return FALSE;
 }
 
-int getDefineIndex(char *name, int defineCounter, Define *defines)
+dNode getDefineIndex(char *name, int defineCounter, dNode defines)
 {
-    int i;
-    for (i = 0; i <= defineCounter; i++)
+    dNode temp = defines;
+    while (temp != NULL)
     {
-        if (strncmp(defines[i].name, name, strlen(name)) == 0 && defines[i].defined == TRUE)
+        if (strncmp(temp->name, name, strlen(name)) == 0 && temp->defined == TRUE)
         {
-            return i;
+            return temp;
         }
+        temp = temp->next;
     }
-    return NA;
+    return NULL;
 }
-int replaceDefines(char *text, int lineNum, int *defineCounter, Define *defines)
+int replaceDefines(char *text, int lineNum, int *defineCounter, dNode defines)
 {
     int length = strlen(text);
     char name[MAX_LABEL_SIZE];
@@ -191,7 +193,7 @@ int replaceDefines(char *text, int lineNum, int *defineCounter, Define *defines)
     int i = 0;
     int p = 0;
     int j = 0;
-    int defineIndex = 0;
+    dNode defineNode = NULL;
     char tempName[MAX_LABEL_SIZE];
     char tempNum[MAX_LINE_SIZE];
     int hasSpace = FALSE;
@@ -246,17 +248,19 @@ int replaceDefines(char *text, int lineNum, int *defineCounter, Define *defines)
                     printf("ERROR: In line %d - Define value is not a number in line: %s", lineNum, text);
                     return TRUE;
                 }
-                if (getDefineIndex(name, *defineCounter, defines) != NA)
+                if (getDefineIndex(name, *defineCounter, defines) != NULL)
                 {
                     printf("ERROR: In line %d - Define label already exists", lineNum);
                     return TRUE;
                 }
                 else
                 {
-
-                    strcpy(defines[*defineCounter].name, name);
-                    defines[*defineCounter].value = atoi(textNum);
-                    defines[*defineCounter].defined = TRUE;
+                    dNode newDefine = (dNode)malloc(sizeof(Define));
+                    defines->next = newDefine;
+                    defines = newDefine;
+                    strcpy(defines->name, name);
+                    defines->value = atoi(textNum);
+                    defines->defined = TRUE;
                     *defineCounter = *defineCounter + 1;
                     return FALSE;
                 }
@@ -295,10 +299,10 @@ int replaceDefines(char *text, int lineNum, int *defineCounter, Define *defines)
                     hasSpace = TRUE;
                 }
                 tempName[j] = '\0';
-                defineIndex = getDefineIndex(tempName, *defineCounter, defines);
-                if (defineIndex != NA && hasSpace)
+                defineNode = getDefineIndex(tempName, *defineCounter, defines);
+                if (defineNode != NULL && hasSpace)
                 {
-                    sprintf(tempNum, "%d", defines[defineIndex].value);
+                    sprintf(tempNum, "%d", defineNode->value);
                     strncat(tempNum, &text[i], strlen(&text[i] - 1));
                     memmove(&text[i - strlen(tempName)], &tempNum, strlen(tempNum) + 1);
                 }
@@ -360,9 +364,19 @@ int savedWord(char *textNum)
     }
     return FALSE;
 }
-void initDefine(Define *defines, int defineCounter)
+void initDefine(dNode defines)
 {
-    memset(defines[defineCounter].name, '\0', MAX_LABEL_SIZE);
-    defines[defineCounter].defined = FALSE;
-    defines[defineCounter].value = NA;
+    memset(defines->name, '\0', MAX_LABEL_SIZE);
+    defines->defined = FALSE;
+    defines->value = NA;
+}
+void freeDefines(dNode defines)
+{
+    dNode temp = defines;
+    while (temp != NULL)
+    {
+        defines = defines->next;
+        free(temp);
+        temp = defines;
+    }
 }
