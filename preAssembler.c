@@ -140,12 +140,12 @@ int processMacro(char *fileName)
                       line[strlen(macroName)] == '\r' ||
                       line[strlen(macroName)] == '\0'))
             {
-                tempAmFile = (char *)realloc(tempAmFile, (strlen(tempAmFile) + strlen(macroContents)));
+                tempAmFile = (char *)realloc(tempAmFile, (strlen(tempAmFile) + strlen(macroContents)) * sizeof(char));
                 strcat(tempAmFile, macroContents);
             }
             else
             {
-                tempAmFile = (char *)realloc(tempAmFile, (strlen(tempAmFile) + strlen(line)));
+                tempAmFile = (char *)realloc(tempAmFile, (strlen(tempAmFile) + strlen(line)) * sizeof(char));
                 strcat(tempAmFile, line);
             }
         }
