@@ -18,9 +18,9 @@ int main(int argc, char *argv[])
 		{
 			if (preAssembel(argv[i]))
 			{
-				printf("\n\t\t\t************ Pre Assembler finished successfully for file \"%s\"! Am file has been created ************\n", argv[i]);
 				return FALSE;
 			}
+			printf("\n\t\t\t************ Pre Assembler finished successfully for file \"%s\"! Am file has been created ************\n", argv[i]);
 			/*compiling and checks if there were no errors*/
 			if (!fAssembler(argv[i]))
 			{

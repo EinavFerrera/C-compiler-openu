@@ -68,7 +68,7 @@ int preAssembel(char *fileName)
     fclose(amFile);
     if (processMacro(fileName))
     {
-        printf("*****************Failed to process macro in file \"%s\".\n", fileName);
+        printf("\t\t\t************ Failed to process macro in file \"%s\" ************\n", fileName);
         return TRUE;
     }
     return FALSE;
@@ -106,6 +106,18 @@ int processMacro(char *fileName)
                 foundMacro = TRUE;
                 strncpy(macroName, line + 4, strlen(line + 4));
                 macroName[strlen(macroName) - 1] = '\0';
+                macroName[strlen(macroName)] = '\0';
+                if (savedWord(macroName))
+                {
+                    printf("ERROR: Macro name cannot be a saved word in the line: %s", line);
+                    return TRUE;
+                }
+                if (hasSpacesInWord(macroName))
+                {
+                    printf("ERROR: Macro name cannot contain more than one label in the line: %s", line);
+                    return TRUE;
+                }
+                clearAllBlanks(macroName);
                 while (fgets(line, sizeof(line), amFile))
                 {
                     if (strncmp(line, "endmcr", 6) == 0)
@@ -120,9 +132,14 @@ int processMacro(char *fileName)
                 }
             }
             else if (macroName[0] != 0 &&
-                     strlen(line) > strlen(macroName) &&
+                     strlen(line) >= strlen(macroName) &&
                      (strncmp(line, macroName, strlen(macroName)) == 0) &&
-                     !isalpha(line[strlen(macroName)]))
+                     (!isalpha(line[strlen(macroName)]) ||
+                      line[strlen(macroName)] == ' ' ||
+                      line[strlen(macroName)] == '\t' ||
+                      line[strlen(macroName)] == '\n' ||
+                      line[strlen(macroName)] == '\r' ||
+                      line[strlen(macroName)] == '\0'))
             {
                 tempAmFile = (char *)realloc(tempAmFile, (strlen(tempAmFile) + strlen(macroContents) + 1));
                 strcat(tempAmFile, macroContents);
