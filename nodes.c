@@ -560,7 +560,7 @@ void clearDuplicateBlankChars(char *line, char *newLine)
 	{
 		if (line[i] == '\t')
 		{
-			line[i] == ' ';
+			line[i] = ' ';
 		}
 		i++;
 	}

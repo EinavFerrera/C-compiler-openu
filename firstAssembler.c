@@ -22,7 +22,7 @@ int fAssembler(char *fileName)
 
     /* Open the input file*/
     strcpy(fileNameAm, fileName);
-    strcat(fileNameAm, ".am"); /* TODO: change to .am*/
+    strcat(fileNameAm, ".am");
     inputFile = fopen(fileNameAm, "r");
     if (inputFile == NULL)
     {
@@ -41,17 +41,15 @@ int fAssembler(char *fileName)
         lineCounter++;
         memset(line, 0, sizeof(line));
     }
-    printf("\t\t\t\t\t\t\t\t\t************ code to nodes finished for file %s! \n", fileName);
     if (searchNode(headNode, "", ERROR_COUNT) != NULL)
     {
-        printf("\t\t\t\t\t\t\t\t\t************ There are errors in the file %s! \n", fileName);
+        printf("\n\t\t\t************ Compiling Stopped ! There are errors in the file \"%s\"! ************ \n", fileName);
         return TRUE;
     }
     /* checks if label are valid - declared and used, no double declerationsm no data label out of limits*/
 
     numOfLinesAssign(headNode, &IC, &DC);
     fixLineaddress(headNode, IC);
-    printf("\t\t\t\t\t\t\t\t\t************ address filled\n");
 
     srcListLenght = sizeof(srcList) / sizeof(srcList[0]);
     labelList = createLabelsList(headNode, labelList, srcList, srcListLenght);
@@ -59,11 +57,9 @@ int fAssembler(char *fileName)
     {
         return TRUE;
     }
-    printf("\t\t\t\t\t\t\t\t\t************ label list is valid\n");
 
     /*checks if type oparnd: both imm/reg = 00, local label = 10 , external label = 01*/
     addLabelsAddressToCnode(headNode, labelList);
-    printf("\t\t\t\t\t\t\t\t\t************ ARE assigned\n");
     fclose(inputFile);
     sAssembler(fileName, headNode, labelList, IC + DC, IC, DC);
     freeAll(headNode, labelList);
@@ -704,12 +700,10 @@ lNode searchListNode(lNode head, char *target, int searchAttr)
             temp = temp->next;
             continue;
         default:
-            printf("ERROR: searchListNode: '%d' is not a valid attribute for search\n", searchAttr);
             return NULL;
             continue;
         }
     }
-    printf("ERROR: searchListNode: '%s' not found\n", target);
     return NULL;
 }
 cNode searchNode(cNode head, char *target, int srcAttr)

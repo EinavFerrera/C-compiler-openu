@@ -67,87 +67,87 @@ int preAssembel(char *fileName)
     fclose(amFile);
     if (processMacro(fileName))
     {
+        printf("*****************Failed to process macro in file \"%s\".\n", fileName);
         return TRUE;
     }
+    return FALSE;
 }
 
 int processMacro(char *fileName)
 {
-    int i;
-    int j;
-    char *macroName = NULL;
+    char macroName[MAX_LABEL_SIZE] = {0};
     char *macroContents;
-    int macroLineCount = 0;
-    char fileNameAb[MAX_LABEL_SIZE];
+    char *tempAmFile;
     char fileNameAm[MAX_LABEL_SIZE];
-    FILE *abFile;
     FILE *amFile;
     char line[MAX_LINE_SIZE] = {0};
     int foundMacro = FALSE;
-
-    /* Open the dst file*/
-    strcpy(fileNameAm, fileName);
-    strcat(fileNameAm, ".am");
-    amFile = fopen(fileNameAm, "r");
-    if (amFile == NULL)
-    {
-        printf("Failed to create new AM file \"%s\".\n", fileName);
-        return TRUE;
-    }
-    strcpy(fileNameAb, fileName);
-    strcat(fileNameAb, ".ab");
-    abFile = fopen(fileNameAb, "w");
-    if (abFile == NULL)
-    {
-        printf("Failed to create new AB file \"%s\".\n", fileName);
-        return TRUE;
-    }
     do
     {
+        /* Open the src file*/
+        strcpy(fileNameAm, fileName);
+        strcat(fileNameAm, ".am");
+        amFile = fopen(fileNameAm, "r");
+        if (amFile == NULL)
+        {
+            printf("Failed to create new AM file \"%s\".\n", fileName);
+            return TRUE;
+        }
+
         foundMacro = FALSE;
         macroContents = (char *)malloc((MAX_LINE_SIZE + 1) * sizeof(char));
+        tempAmFile = (char *)malloc((MAX_LINE_SIZE + 1) * sizeof(char));
+        tempAmFile[0] = '\0';
         while (fgets(line, sizeof(line), amFile))
         {
-            printf("line:\t_%s_\n", line);
-            if (macroName == NULL && strncmp(line[0], "mcr", 3) == 0)
+            if (macroName[0] == 0 && strncmp(line, "mcr", 3) == 0)
             {
-                printf("i am in mcr foundation\n");
                 foundMacro = TRUE;
-                macroName = strtok(line[4], " \r\n");
+                strncpy(macroName, line + 4, strlen(line + 4));
+                macroName[strlen(macroName) - 1] = '\0';
                 while (fgets(line, sizeof(line), amFile))
                 {
-                    if (strncmp(line[0], "endmcr", 6) == 0)
+                    if (strncmp(line, "endmcr", 6) == 0)
                     {
-                        fgets(line, sizeof(line), amFile);
                         break;
                     }
                     else
                     {
-                        macroContents = (char *)realloc(macroContents, (macroLineCount + strlen(line)));
+                        macroContents = (char *)realloc(macroContents, (strlen(macroContents) + strlen(line) + 1));
                         strcat(macroContents, line);
                     }
                 }
             }
-            else if (macroName != NULL &&
+            else if (macroName[0] != 0 &&
                      strlen(line) > strlen(macroName) &&
-                     strncmp(line[0], macroName, strlen(macroName)) == 0)
+                     (strncmp(line, macroName, strlen(macroName)) == 0) &&
+                     !isalpha(line[strlen(macroName)]))
             {
-                printf("i am in mcr replaction\n");
-
-                printf("content:\t_%s_\n", macroContents);
-                fprintf(abFile, "%s", macroContents);
+                tempAmFile = (char *)realloc(tempAmFile, (strlen(tempAmFile) + strlen(macroContents) + 1));
+                strcat(tempAmFile, macroContents);
             }
             else
             {
-                printf("i am alone\n");
-                printf("line:\t_%s_\n", line);
-                fprintf(abFile, "%s", line);
+                tempAmFile = (char *)realloc(tempAmFile, (strlen(tempAmFile) + strlen(line) + 1));
+                strcat(tempAmFile, line);
             }
         }
+        /* Open the dst file*/
+        strcpy(fileNameAm, fileName);
+        strcat(fileNameAm, ".am");
+        amFile = fopen(fileNameAm, "w");
+        if (amFile == NULL)
+        {
+            printf("Failed to create new AM file \"%s\".\n", fileName);
+            return TRUE;
+        }
+
+        fprintf(amFile, "%s", tempAmFile);
         free(macroContents);
+        free(tempAmFile);
+        memset(macroName, 0, sizeof(macroName));
+        fclose(amFile);
     } while (foundMacro);
-    fclose(amFile);
-    fclose(abFile);
     return FALSE;
 }
 

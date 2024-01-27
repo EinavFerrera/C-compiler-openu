@@ -28,13 +28,13 @@ int sAssembler(char *fileName, cNode headNode, lNode labelList, int codeLength, 
     binaryToSigns(outputFile, binaryCode, IC, DC);
     if (searchListNode(labelList, "20", TYPE) != NULL)
     {
-        printf("\t\t\t\t\t\t\t\t\t************ entry label created\n");
+        printf("\n\t\t\t************ ent file was created successfully ************\n");
         createEntryExternFile(labelList, ENTRY, fileName);
     }
     if (searchListNode(labelList, "21", TYPE) != NULL)
     {
         createEntryExternFile(labelList, EXT, fileName);
-        printf("\t\t\t\t\t\t\t\t\t************ extern Label created\n");
+        printf("\n\t\t\t************ extern Label created successfully ************\n");
     }
     free(binaryCode);
     fclose(outputFile);
