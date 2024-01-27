@@ -210,6 +210,7 @@ int replaceDefines(char *text, int lineNum, int *defineCounter, Define *defines)
                 i++;
                 j++;
             }
+            name[j] = '\0';
             if (text[i] == '\0')
             {
                 printf("ERROR: In line %d - Define has no valid define label in line: %s", lineNum, text);
