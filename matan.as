@@ -9,7 +9,6 @@ a: mov #1               , c
 endmcr
 YO: bne r7
 c: jmp bnana
-.define yoyo = a
 gae: hlt
 abc  
 sub #18, r7      
@@ -18,4 +17,4 @@ YOYO: .string "BBCasd"
 BABA143: .string "ABC as    t"
 g: .data     5 ,    -2046 , +987
 .extern bnana
-.extern asdfg '\0'
+.extern asdfg 

@@ -15,7 +15,7 @@ nodes.o: nodes.c genericH.h
 
 
 clean:
-	rm -f *.o
+	rm -f *.o *.am *.ob *.ent *.ext
 
 .PHONY: all
 all: assembler clean

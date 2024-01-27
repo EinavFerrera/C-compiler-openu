@@ -133,6 +133,8 @@ int processMacro(char *fileName)
                 strcat(tempAmFile, line);
             }
         }
+        fclose(amFile);
+
         /* Open the dst file*/
         strcpy(fileNameAm, fileName);
         strcat(fileNameAm, ".am");
