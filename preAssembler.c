@@ -37,7 +37,6 @@ int preAssembel(char *fileName)
 
     defines = (Define *)malloc(2 * sizeof(Define));
     initDefine(defines, 0);
-    initDefine(defines, 1);
 
     while (fgets(line, sizeof(line), asFile))
     {
