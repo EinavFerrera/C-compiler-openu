@@ -70,10 +70,12 @@ void removeCarrigeReturn(char *line)
     int i = 0;
     for (i = 0; i < strlen(line); i++)
     {
+        printf("%d", line[i]);
         if (line[i] == 13)
         {
             line[i] = 10;
             line[i + 1] = 0;
+            printf("\n");
             return;
         }
     }

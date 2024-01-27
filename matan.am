@@ -1,9 +1,0 @@
-.entry lae
-
-mcr abc 
-lae: cmp #123, EXTERE[2] 
-a: mov #1 , c
-.extern EXTERE
-endmcr
-YO: bne r7
-c: jmp bnana
