@@ -52,11 +52,19 @@ int replaceDefines(char *text, int lineNum, int *counter, Define *defines);
 int removeCommentsAndSpaces(char *line);
 
 /**
- * Saves the word in the token.
+ *checks if it is a saved word.
  *
  * @param token the word to comapre to the saved words.
  * @return 1 if is a saved word, 0 otherwise.
  */
 int savedWord(char *token);
+
+/**
+ * S.
+ *
+ * @param defines pointer to the array.
+ * @param defineCounter the index in the array to initiate.
+ */
+void initDefine(Define *defines, int defineCounter);
 
 #endif
