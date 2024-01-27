@@ -125,7 +125,7 @@ int processMacro(char *fileName)
                     }
                     else
                     {
-                        macroContents = (char *)realloc(macroContents, (strlen(macroContents) + strlen(line)));
+                        macroContents = (char *)realloc(macroContents, (1 + strlen(macroContents) + strlen(line)) * sizeof(char));
                         strcat(macroContents, line);
                     }
                 }
@@ -140,12 +140,12 @@ int processMacro(char *fileName)
                       line[strlen(macroName)] == '\r' ||
                       line[strlen(macroName)] == '\0'))
             {
-                tempAmFile = (char *)realloc(tempAmFile, (strlen(tempAmFile) + strlen(macroContents)) * sizeof(char));
+                tempAmFile = (char *)realloc(tempAmFile, (1 + strlen(tempAmFile) + strlen(macroContents)) * sizeof(char));
                 strcat(tempAmFile, macroContents);
             }
             else
             {
-                tempAmFile = (char *)realloc(tempAmFile, (strlen(tempAmFile) + strlen(line)) * sizeof(char));
+                tempAmFile = (char *)realloc(tempAmFile, (1 + strlen(tempAmFile) + strlen(line)) * sizeof(char));
                 strcat(tempAmFile, line);
             }
         }
