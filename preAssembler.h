@@ -1,6 +1,13 @@
 #ifndef preAssembler
 #define preAssembler
 
+typedef struct
+{
+    char name[MAX_LABEL_SIZE]; /* array of defines*/
+    int value;                 /*define's value*/
+    int defined;               /*the flag indicate if the define is already exists*/
+} Define;
+
 /**
  * Compiles the given file.
  *
@@ -24,7 +31,7 @@ int processMacro(char *fileName);
  * @param defineCounter The number of defines already made.
  * @return The index of the define if found, -1 otherwise.
  */
-int getDefineIndex(char *name, int defineCounter);
+int getDefineIndex(char *name, int defineCounter, Define *defines);
 
 /**
  * Replaces the defines in the given text.
@@ -34,7 +41,7 @@ int getDefineIndex(char *name, int defineCounter);
  * @param defineCounter The number of defines already made.
  * @return 1 if found an error, 0 if found a define decleration, 2 if found an define use that have been replaced.
  */
-int replaceDefines(char *text, int lineNum, int *counter);
+int replaceDefines(char *text, int lineNum, int *counter, Define *defines);
 
 /**
  * Removes comments and spaces from the given line.

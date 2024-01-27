@@ -1,6 +1,6 @@
 .entry lae
 sub #1, r1      
-mcr ba m   
+mcr bam   
 lae: cmp #123, EXTERE[2] 
 a: mov #1               , c
 .extern EXTERE

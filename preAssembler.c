@@ -1,14 +1,5 @@
 #include "genericH.h"
 
-typedef struct
-{
-    char name[MAX_LABEL_SIZE]; /* array of defines*/
-    int value;                 /*define's value*/
-    int defined;               /*the flag indicate if the define is already exists*/
-} Define;
-
-Define defines[MAX_DEFINES] = {0};
-
 int preAssembel(char *fileName)
 {
     /*var decleration section*/
@@ -20,6 +11,7 @@ int preAssembel(char *fileName)
     int lineCounter;
     int isDefineLine = 0;
     int defineCounter = 0;
+    Define *defines;
 
     /*------------------------*/
     lineCounter = 1;
@@ -43,6 +35,10 @@ int preAssembel(char *fileName)
         return TRUE;
     }
 
+    defines = (Define *)malloc(1 * sizeof(Define));
+    defines[0].defined = FALSE;
+    defines[0].name[0] = 0;
+    defines[0].value = NA;
     while (fgets(line, sizeof(line), asFile))
     {
         removeCarrigeReturn(line);
@@ -50,13 +46,18 @@ int preAssembel(char *fileName)
         {
             continue;
         }
-        isDefineLine = replaceDefines(line, lineCounter, &defineCounter);
+        isDefineLine = replaceDefines(line, lineCounter, &defineCounter, defines);
         if (isDefineLine == 1)
         { /*if define return 1 its an error, if returns 0 = skip define line*/
+            free(defines);
             return TRUE;
         }
         else if (isDefineLine == 0)
         {
+            defines = (Define *)malloc(defineCounter * sizeof(Define));
+            defines[defineCounter].defined = FALSE;
+            defines[defineCounter].name[0] = 0;
+            defines[defineCounter].value = NA;
             memset(line, 0, sizeof(line));
             continue;
         }
@@ -64,6 +65,7 @@ int preAssembel(char *fileName)
         memset(line, 0, sizeof(line));
         lineCounter++;
     }
+    free(defines);
     fclose(asFile);
     fclose(amFile);
     if (processMacro(fileName))
@@ -171,7 +173,7 @@ int processMacro(char *fileName)
     return FALSE;
 }
 
-int getDefineIndex(char *name, int defineCounter)
+int getDefineIndex(char *name, int defineCounter, Define *defines)
 {
     int i;
     for (i = 0; i <= defineCounter; i++)
@@ -183,7 +185,7 @@ int getDefineIndex(char *name, int defineCounter)
     }
     return NA;
 }
-int replaceDefines(char *text, int lineNum, int *defineCounter)
+int replaceDefines(char *text, int lineNum, int *defineCounter, Define *defines)
 {
     int length = strlen(text);
     char name[MAX_LABEL_SIZE];
@@ -245,13 +247,14 @@ int replaceDefines(char *text, int lineNum, int *defineCounter)
                     printf("ERROR: In line %d - Define value is not a number in line: %s", lineNum, text);
                     return TRUE;
                 }
-                if (getDefineIndex(name, *defineCounter) != NA)
+                if (getDefineIndex(name, *defineCounter, defines) != NA)
                 {
                     printf("ERROR: In line %d - Define label already exists", lineNum);
                     return TRUE;
                 }
                 else
                 {
+
                     strcpy(defines[*defineCounter].name, name);
                     defines[*defineCounter].value = atoi(textNum);
                     defines[*defineCounter].defined = TRUE;
@@ -293,7 +296,7 @@ int replaceDefines(char *text, int lineNum, int *defineCounter)
                     hasSpace = TRUE;
                 }
                 tempName[j] = '\0';
-                defineIndex = getDefineIndex(tempName, *defineCounter);
+                defineIndex = getDefineIndex(tempName, *defineCounter, defines);
                 if (defineIndex != NA && hasSpace)
                 {
                     sprintf(tempNum, "%d", defines[defineIndex].value);
