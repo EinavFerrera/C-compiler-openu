@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := all
 
 assembler: main.o preAssembler.o firstAssembler.o secAssembler.o nodes.o
-	gcc *.c -Wall -ansi -pedantic -o assembler -lm
+	gcc *.c -Wall -ansi -pedantic -o assembler -lm -ggdb3
 main.o: main.c genericH.h
 	gcc main.c -Wall -ansi -pedantic -c
 preAssembler.o: preAssembler.c genericH.h
