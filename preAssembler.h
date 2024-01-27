@@ -12,10 +12,10 @@ int preAssembel(char *fileName);
 /**
  * Processes the macro in the input file.
  *
- * @param inputfile The input file to process.
+ * @param fileName The input file name to process.
  * @return 0 if successful, -1 otherwise.
  */
-int processMacro(FILE *inputfile);
+int processMacro(char *fileName);
 
 /**
  * Gets the index of the define with the given name.

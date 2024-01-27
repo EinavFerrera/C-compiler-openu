@@ -63,46 +63,93 @@ int preAssembel(char *fileName)
         memset(line, 0, sizeof(line));
         lineCounter++;
     }
-    if (processMacro(amFile))
-        // {
-        //     return;
-        // }
-
-        fclose(asFile);
+    fclose(asFile);
     fclose(amFile);
+    if (processMacro(fileName))
+    {
+        return TRUE;
+    }
 }
 
-// int processMacro(FILE *inputfile)
-// // int processMacro(char *input[], int *lineCount)
-// {
-//     int i;
-//     int j;
-//     char *macroName = NULL;
-//     char *macroContents[MAX_LINES];
-//     int macroLineCount = 0;
-//     for (i = 0; i < *lineCount; i++)
-//     {
-//         if (strncmp(input[i], "mcr", 3) == 0)
-//         {
-//             macroName = strtok(input[i] + 4, " ");
-//             i++; /*Skip the mcr line*/
-//             while (strncmp(input[i], "endmcr", 6) != 0)
-//             {
-//                 macroContents[macroLineCount++] = input[i++];
-//             }
-//         }
-//         else if (macroName != NULL && strncmp(input[i], macroName, strlen(macroName)) == 0)
-//         {
-//             /*Replace macro invocation with macroContents*/
-//             for (j = 0; j < macroLineCount; j++)
-//             {
-//                 input[*lineCount + j] = macroContents[j];
-//             }
-//             *lineCount += macroLineCount;
-//             macroName = NULL; /*Reset macroName after processing*/
-//         }
-//     }
-// }
+int processMacro(char *fileName)
+{
+    int i;
+    int j;
+    char *macroName = NULL;
+    char *macroContents;
+    int macroLineCount = 0;
+    char fileNameAb[MAX_LABEL_SIZE];
+    char fileNameAm[MAX_LABEL_SIZE];
+    FILE *abFile;
+    FILE *amFile;
+    char line[MAX_LINE_SIZE] = {0};
+    int foundMacro = FALSE;
+
+    /* Open the dst file*/
+    strcpy(fileNameAm, fileName);
+    strcat(fileNameAm, ".am");
+    amFile = fopen(fileNameAm, "r");
+    if (amFile == NULL)
+    {
+        printf("Failed to create new AM file \"%s\".\n", fileName);
+        return TRUE;
+    }
+    strcpy(fileNameAb, fileName);
+    strcat(fileNameAb, ".ab");
+    abFile = fopen(fileNameAb, "w");
+    if (abFile == NULL)
+    {
+        printf("Failed to create new AB file \"%s\".\n", fileName);
+        return TRUE;
+    }
+    do
+    {
+        foundMacro = FALSE;
+        macroContents = (char *)malloc((MAX_LINE_SIZE + 1) * sizeof(char));
+        while (fgets(line, sizeof(line), amFile))
+        {
+            printf("line:\t_%s_\n", line);
+            if (macroName == NULL && strncmp(line[0], "mcr", 3) == 0)
+            {
+                printf("i am in mcr foundation\n");
+                foundMacro = TRUE;
+                macroName = strtok(line[4], " \r\n");
+                while (fgets(line, sizeof(line), amFile))
+                {
+                    if (strncmp(line[0], "endmcr", 6) == 0)
+                    {
+                        fgets(line, sizeof(line), amFile);
+                        break;
+                    }
+                    else
+                    {
+                        macroContents = (char *)realloc(macroContents, (macroLineCount + strlen(line)));
+                        strcat(macroContents, line);
+                    }
+                }
+            }
+            else if (macroName != NULL &&
+                     strlen(line) > strlen(macroName) &&
+                     strncmp(line[0], macroName, strlen(macroName)) == 0)
+            {
+                printf("i am in mcr replaction\n");
+
+                printf("content:\t_%s_\n", macroContents);
+                fprintf(abFile, "%s", macroContents);
+            }
+            else
+            {
+                printf("i am alone\n");
+                printf("line:\t_%s_\n", line);
+                fprintf(abFile, "%s", line);
+            }
+        }
+        free(macroContents);
+    } while (foundMacro);
+    fclose(amFile);
+    fclose(abFile);
+    return FALSE;
+}
 
 int getDefineIndex(char *name, int defineCounter)
 {
