@@ -34,7 +34,7 @@ int getDefineIndex(char *name, int defineCounter);
  * @param defineCounter The number of defines already made.
  * @return 1 if found an error, 0 if found a define decleration, 2 if found an define use that have been replaced.
  */
-int replaceDefines(char *text, int lineNum, int defineCounter);
+int replaceDefines(char *text, int lineNum, int *counter);
 
 /**
  * Removes comments and spaces from the given line.

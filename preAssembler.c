@@ -49,9 +49,7 @@ int preAssembel(char *fileName)
         {
             continue;
         }
-        printf("i know who am i ! %d\n", defineCounter);
-        isDefineLine = replaceDefines(line, lineCounter, defineCounter);
-        printf("who am i ?! %d\n", defineCounter);
+        isDefineLine = replaceDefines(line, lineCounter, &defineCounter);
         if (isDefineLine == 1)
         { /*if define return 1 its an error, if returns 0 = skip define line*/
             return TRUE;
@@ -65,12 +63,12 @@ int preAssembel(char *fileName)
         memset(line, 0, sizeof(line));
         lineCounter++;
     }
-    // if (processMacro(amFile))
-    // {
-    //     return;
-    // }
+    if (processMacro(amFile))
+        // {
+        //     return;
+        // }
 
-    fclose(asFile);
+        fclose(asFile);
     fclose(amFile);
 }
 
@@ -109,16 +107,16 @@ int preAssembel(char *fileName)
 int getDefineIndex(char *name, int defineCounter)
 {
     int i;
-    for (i = 0; i < defineCounter; i++)
+    for (i = 0; i <= defineCounter; i++)
     {
         if (strcmp(defines[i].name, name) == 0 && defines[i].defined)
         {
             return i;
         }
     }
-    return -1;
+    return NA;
 }
-int replaceDefines(char *text, int lineNum, int defineCounter)
+int replaceDefines(char *text, int lineNum, int *defineCounter)
 {
     int length = strlen(text);
     char name[MAX_LABEL_SIZE];
@@ -138,9 +136,9 @@ int replaceDefines(char *text, int lineNum, int defineCounter)
             i += 8;
             while (text[i] != '\0' && text[i] != ' ' && text[i] != '=')
             {
-                if (!isalpha(text[i]) && text[i] > 96)
+                if (text[i] < 97 || text[i] > 122)
                 {
-                    printf("ERROR: In line %d - Define '%s' has no valid define label.\n", lineNum, text);
+                    printf("ERROR: In line %d - Define has no valid define label in line : %s", lineNum, text);
                     return TRUE;
                 }
                 name[j] = text[i];
@@ -149,7 +147,7 @@ int replaceDefines(char *text, int lineNum, int defineCounter)
             }
             if (text[i] == '\0')
             {
-                printf("ERROR: In line %d - Define '%s' has no valid define label.\n", lineNum, text);
+                printf("ERROR: In line %d - Define has no valid define label in line: %s", lineNum, text);
                 return TRUE;
             }
             if (text[i] == ' ')
@@ -172,33 +170,31 @@ int replaceDefines(char *text, int lineNum, int defineCounter)
                 textNum[p] = '\0';
                 if (savedWord(textNum))
                 {
-                    printf("ERROR: In line %d - Define '%s' cannot be a saved word.\n", lineNum, text);
+                    printf("ERROR: In line %d - Define cannot be a saved word in the line: %s", lineNum, text);
                     return TRUE;
                 }
                 if (!isOnlyDigit(textNum))
                 {
-                    printf("ERROR: In line %d - Define '%s' value is not a number.\n", lineNum, text);
+                    printf("ERROR: In line %d - Define value is not a number in line: %s", lineNum, text);
                     return TRUE;
                 }
-                if (getDefineIndex(name, defineCounter) != NA)
+                if (getDefineIndex(name, *defineCounter) != NA)
                 {
-                    printf("ERROR: In line %d - Define '%s' already exists.\n", lineNum, text);
+                    printf("ERROR: In line %d - Define label already exists", lineNum);
                     return TRUE;
                 }
                 else
                 {
-                    strcpy(defines[defineCounter].name, name);
-                    defines[defineCounter].value = atoi(textNum);
-                    defines[defineCounter].defined = TRUE;
-                    printf("here! %d\n", defineCounter);
-                    defineCounter = defineCounter + 1;
-                    printf("here! %d\n", defineCounter);
+                    strcpy(defines[*defineCounter].name, name);
+                    defines[*defineCounter].value = atoi(textNum);
+                    defines[*defineCounter].defined = TRUE;
+                    *defineCounter = *defineCounter + 1;
                     return FALSE;
                 }
             }
             else
             {
-                printf("ERROR: In line %d - Define decleration '%s' does not contain number.\n", lineNum, text);
+                printf("ERROR: In line %d - Define decleration does not contain number in line: %s", lineNum, text);
                 return TRUE;
             }
         }
@@ -207,10 +203,17 @@ int replaceDefines(char *text, int lineNum, int defineCounter)
             while (text[i] != '\0')
             {
                 if (text[i] == ' ' ||
+                    text[i] == ',' ||
                     text[i] == '#')
                 {
                     hasSpace = TRUE;
+                    i++;
+                    if (text[i - 1] == ',' && text[i] == ' ')
+                    {
+                        i++;
+                    }
                 }
+
                 while (isalpha(text[i]))
                 {
                     tempName[j] = text[i];
@@ -223,7 +226,7 @@ int replaceDefines(char *text, int lineNum, int defineCounter)
                     hasSpace = TRUE;
                 }
                 tempName[j] = '\0';
-                defineIndex = getDefineIndex(tempName, defineCounter);
+                defineIndex = getDefineIndex(tempName, *defineCounter);
                 if (defineIndex != NA && hasSpace)
                 {
                     sprintf(tempNum, "%d", defines[defineIndex].value);
