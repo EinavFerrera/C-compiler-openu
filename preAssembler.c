@@ -11,28 +11,6 @@ Define defines[MAX_DEFINES] = {0};
 
 int preAssembel(char *fileName)
 {
-    /*
-     open file with am to write
-     open file with as to read
-     pass 1:
-        read line by line from AS
-        replace all comments and spaces
-     pass 2:
-        read line by line from AM
-        replace all macros
-     pass 3:
-        read line by line from AM
-        replace all defines
-            read line by line
-            if line is a macro
-                read macro
-                replace macro with macro content
-            if line is a define
-                add define to defines array
-            if line is already defined
-                show error
-
-    */
     /*var decleration section*/
     char fileNameAs[MAX_LABEL_SIZE];
     char fileNameAm[MAX_LABEL_SIZE];
@@ -41,6 +19,8 @@ int preAssembel(char *fileName)
     char line[MAX_LINE_SIZE] = {0};
     int lineCounter;
     int isDefineLine = 0;
+    int defineCounter = 0;
+
     /*------------------------*/
     lineCounter = 1;
 
@@ -69,7 +49,9 @@ int preAssembel(char *fileName)
         {
             continue;
         }
-        isDefineLine = replaceDefines(line, lineCounter);
+        printf("i know who am i ! %d\n", defineCounter);
+        isDefineLine = replaceDefines(line, lineCounter, defineCounter);
+        printf("who am i ?! %d\n", defineCounter);
         if (isDefineLine == 1)
         { /*if define return 1 its an error, if returns 0 = skip define line*/
             return TRUE;
@@ -124,10 +106,10 @@ int preAssembel(char *fileName)
 //     }
 // }
 
-int getDefineIndex(char *name)
+int getDefineIndex(char *name, int defineCounter)
 {
     int i;
-    for (i = 0; i < MAX_DEFINES; i++)
+    for (i = 0; i < defineCounter; i++)
     {
         if (strcmp(defines[i].name, name) == 0 && defines[i].defined)
         {
@@ -136,7 +118,7 @@ int getDefineIndex(char *name)
     }
     return -1;
 }
-int replaceDefines(char *text, int lineNum)
+int replaceDefines(char *text, int lineNum, int defineCounter)
 {
     int length = strlen(text);
     char name[MAX_LABEL_SIZE];
@@ -144,7 +126,6 @@ int replaceDefines(char *text, int lineNum)
     int i = 0;
     int p = 0;
     int j = 0;
-    int defineCounter = 0;
     int defineIndex = 0;
     char tempName[MAX_LABEL_SIZE];
     char tempNum[MAX_LINE_SIZE];
@@ -199,7 +180,7 @@ int replaceDefines(char *text, int lineNum)
                     printf("ERROR: In line %d - Define '%s' value is not a number.\n", lineNum, text);
                     return TRUE;
                 }
-                if (getDefineIndex(name) != -1)
+                if (getDefineIndex(name, defineCounter) != NA)
                 {
                     printf("ERROR: In line %d - Define '%s' already exists.\n", lineNum, text);
                     return TRUE;
@@ -209,7 +190,9 @@ int replaceDefines(char *text, int lineNum)
                     strcpy(defines[defineCounter].name, name);
                     defines[defineCounter].value = atoi(textNum);
                     defines[defineCounter].defined = TRUE;
-                    defineCounter++;
+                    printf("here! %d\n", defineCounter);
+                    defineCounter = defineCounter + 1;
+                    printf("here! %d\n", defineCounter);
                     return FALSE;
                 }
             }
@@ -219,7 +202,6 @@ int replaceDefines(char *text, int lineNum)
                 return TRUE;
             }
         }
-
         else
         {
             while (text[i] != '\0')
@@ -241,8 +223,8 @@ int replaceDefines(char *text, int lineNum)
                     hasSpace = TRUE;
                 }
                 tempName[j] = '\0';
-                defineIndex = getDefineIndex(tempName);
-                if (defineIndex >= 0 && hasSpace)
+                defineIndex = getDefineIndex(tempName, defineCounter);
+                if (defineIndex != NA && hasSpace)
                 {
                     sprintf(tempNum, "%d", defines[defineIndex].value);
                     strncat(tempNum, &text[i], strlen(&text[i] - 1));
@@ -271,7 +253,9 @@ int removeCommentsAndSpaces(char *line)
 }
 int savedWord(char *textNum)
 {
-    if (strcmp(textNum, "mov") == 0 ||
+    if (strcmp(textNum, "mcr") == 0 ||
+        strcmp(textNum, "endmcr") == 0 ||
+        strcmp(textNum, "mov") == 0 ||
         strcmp(textNum, "cmp") == 0 ||
         strcmp(textNum, "add") == 0 ||
         strcmp(textNum, "sub") == 0 ||
@@ -286,7 +270,7 @@ int savedWord(char *textNum)
         strcmp(textNum, "prn") == 0 ||
         strcmp(textNum, "jsr") == 0 ||
         strcmp(textNum, "rts") == 0 ||
-        strcmp(textNum, "stop") == 0 ||
+        strcmp(textNum, "hlt") == 0 ||
         strcmp(textNum, "r0") == 0 ||
         strcmp(textNum, "r1") == 0 ||
         strcmp(textNum, "r2") == 0 ||
