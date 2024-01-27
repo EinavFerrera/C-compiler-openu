@@ -94,9 +94,9 @@ int processMacro(char *fileName)
         }
 
         foundMacro = FALSE;
-        macroContents = (char *)malloc(1);
+        macroContents = (char *)malloc(MAX_LINE_SIZE * sizeof(char));
         macroContents[0] = '\0';
-        tempAmFile = (char *)malloc(1);
+        tempAmFile = (char *)malloc(MAX_LINE_SIZE * sizeof(char));
         tempAmFile[0] = '\0';
         while (fgets(line, sizeof(line), amFile))
         {
