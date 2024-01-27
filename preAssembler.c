@@ -45,6 +45,7 @@ int preAssembel(char *fileName)
 
     while (fgets(line, sizeof(line), asFile))
     {
+        removeCarrigeReturn(line);
         if (removeCommentsAndSpaces(line)) /*if comments return 1, or replace line with single space only*/
         {
             continue;
