@@ -175,7 +175,7 @@ int getDefineIndex(char *name, int defineCounter, Define *defines)
     int i;
     for (i = 0; i <= defineCounter; i++)
     {
-        if (strcmp(defines[i].name, name) == 0 && defines[i].defined)
+        if (strncmp(defines[i].name, name, strlen(name)) == 0 && defines[i].defined == TRUE)
         {
             return i;
         }
