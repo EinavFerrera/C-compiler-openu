@@ -35,8 +35,10 @@ int preAssembel(char *fileName)
         return TRUE;
     }
 
-    defines = (Define *)malloc(1 * sizeof(Define));
+    defines = (Define *)malloc(2 * sizeof(Define));
     initDefine(defines, 0);
+    initDefine(defines, 1);
+
     while (fgets(line, sizeof(line), asFile))
     {
         removeCarrigeReturn(line);
@@ -52,7 +54,7 @@ int preAssembel(char *fileName)
         }
         else if (isDefineLine == 0)
         {
-            defines = (Define *)malloc((1 + defineCounter) * sizeof(Define));
+            defines = (Define *)malloc((defineCounter) * sizeof(Define));
             initDefine(defines, defineCounter);
             memset(line, 0, sizeof(line));
             continue;
@@ -361,11 +363,7 @@ int savedWord(char *textNum)
 }
 void initDefine(Define *defines, int defineCounter)
 {
-    int i;
-    for (i = 0; i < MAX_LABEL_SIZE; i++)
-    {
-        defines[defineCounter].name[i] = 0;
-    }
+    memset(defines[defineCounter].name, '\0', MAX_LABEL_SIZE);
     defines[defineCounter].defined = FALSE;
     defines[defineCounter].value = NA;
 }
