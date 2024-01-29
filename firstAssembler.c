@@ -27,6 +27,7 @@ int fAssembler(char *fileName)
     if (inputFile == NULL)
     {
         printf("Failed to open the file \"%s\".\n", fileName);
+        freeAll(headNode, labelList);
         return TRUE;
     }
     while (fgets(line, sizeof(line), inputFile))
@@ -43,6 +44,8 @@ int fAssembler(char *fileName)
     if (searchNode(headNode, "", ERROR_COUNT) != NULL)
     {
         printf("\n\t\t\t************ Compiling Stopped ! There are errors in the file \"%s\"! ************ \n", fileName);
+        freeAll(headNode, labelList);
+        fclose(inputFile);
         return TRUE;
     }
     /* checks if label are valid - declared and used, no double declerationsm no data label out of limits*/
@@ -54,6 +57,8 @@ int fAssembler(char *fileName)
     labelList = createLabelsList(headNode, labelList, srcList, srcListLenght);
     if (!validateLabelList(labelList, headNode))
     {
+        fclose(inputFile);
+        freeAll(headNode, labelList);
         return TRUE;
     }
 

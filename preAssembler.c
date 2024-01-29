@@ -11,7 +11,7 @@ int preAssembel(char *fileName)
     int lineCounter;
     int isDefineLine = 0;
     int defineCounter = 0;
-    dNode *defines = NULL;
+    dNode defines = NULL;
 
     /*------------------------*/
     lineCounter = 1;
@@ -36,7 +36,10 @@ int preAssembel(char *fileName)
     }
 
     defines = (dNode)malloc(sizeof(Define));
-    initDefine(defines);
+    memset(defines->name, 0, MAX_LABEL_SIZE);
+    defines->value = NA;
+    defines->defined = FALSE;
+    defines->next = NULL;
 
     while (fgets(line, sizeof(line), asFile))
     {
@@ -45,7 +48,7 @@ int preAssembel(char *fileName)
         {
             continue;
         }
-        isDefineLine = replaceDefines(line, lineCounter, &defineCounter, defines);
+        isDefineLine = replaceDefines(line, lineCounter, &defineCounter, &defines);
 
         if (isDefineLine == 1)
         { /*if define return 1 its an error, if returns 0 = skip define line*/
@@ -54,8 +57,6 @@ int preAssembel(char *fileName)
         }
         else if (isDefineLine == 0)
         {
-            defines = (Define *)malloc((defineCounter) * sizeof(Define));
-            initDefine(defines);
             memset(line, 0, sizeof(line));
             continue;
         }
@@ -63,6 +64,7 @@ int preAssembel(char *fileName)
         memset(line, 0, sizeof(line));
         lineCounter++;
     }
+
     freeDefines(defines);
     fclose(asFile);
     fclose(amFile);
@@ -185,7 +187,7 @@ dNode getDefineIndex(char *name, int defineCounter, dNode defines)
     }
     return NULL;
 }
-int replaceDefines(char *text, int lineNum, int *defineCounter, dNode defines)
+int replaceDefines(char *text, int lineNum, int *defineCounter, dNode *defines)
 {
     int length = strlen(text);
     char name[MAX_LABEL_SIZE];
@@ -194,6 +196,7 @@ int replaceDefines(char *text, int lineNum, int *defineCounter, dNode defines)
     int p = 0;
     int j = 0;
     dNode defineNode = NULL;
+
     char tempName[MAX_LABEL_SIZE];
     char tempNum[MAX_LINE_SIZE];
     int hasSpace = FALSE;
@@ -248,7 +251,7 @@ int replaceDefines(char *text, int lineNum, int *defineCounter, dNode defines)
                     printf("ERROR: In line %d - Define value is not a number in line: %s", lineNum, text);
                     return TRUE;
                 }
-                if (getDefineIndex(name, *defineCounter, defines) != NULL)
+                if (getDefineIndex(name, *defineCounter, *defines) != NULL)
                 {
                     printf("ERROR: In line %d - Define label already exists", lineNum);
                     return TRUE;
@@ -256,11 +259,11 @@ int replaceDefines(char *text, int lineNum, int *defineCounter, dNode defines)
                 else
                 {
                     dNode newDefine = (dNode)malloc(sizeof(Define));
-                    defines->next = newDefine;
-                    defines = newDefine;
-                    strcpy(defines->name, name);
-                    defines->value = atoi(textNum);
-                    defines->defined = TRUE;
+                    strcpy(newDefine->name, name);
+                    newDefine->value = atoi(textNum);
+                    newDefine->defined = TRUE;
+                    newDefine->next = *defines;
+                    *defines = newDefine;
                     *defineCounter = *defineCounter + 1;
                     return FALSE;
                 }
@@ -299,7 +302,7 @@ int replaceDefines(char *text, int lineNum, int *defineCounter, dNode defines)
                     hasSpace = TRUE;
                 }
                 tempName[j] = '\0';
-                defineNode = getDefineIndex(tempName, *defineCounter, defines);
+                defineNode = getDefineIndex(tempName, *defineCounter, *defines);
                 if (defineNode != NULL && hasSpace)
                 {
                     sprintf(tempNum, "%d", defineNode->value);
@@ -363,12 +366,6 @@ int savedWord(char *textNum)
         return TRUE;
     }
     return FALSE;
-}
-void initDefine(dNode defines)
-{
-    memset(defines->name, '\0', MAX_LABEL_SIZE);
-    defines->defined = FALSE;
-    defines->value = NA;
 }
 void freeDefines(dNode defines)
 {
