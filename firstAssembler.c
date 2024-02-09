@@ -63,7 +63,6 @@ int fAssembler(char *fileName)
     }
 
     /*checks if type oparnd: both imm/reg = 00, local label = 10 , external label = 01*/
-    printListLoop(labelList);
     addLabelsAddressToCnode(headNode, labelList);
     fclose(inputFile);
     sAssembler(fileName, headNode, labelList, IC + DC, IC, DC);

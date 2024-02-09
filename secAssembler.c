@@ -9,7 +9,6 @@ int sAssembler(char *fileName, cNode headNode, lNode labelList, int codeLength, 
     char *binaryCode = (char *)calloc(15 * codeLength, sizeof(char)); /*allocating the length of the lines for the binary code*/
 
     /*------------------------*/
-    printLoop(headNode);
 
     strcpy(fileNameOb, fileName);
     strcat(fileNameOb, ".ob");
@@ -150,7 +149,6 @@ int nodesToBinary(cNode headNode, lNode labelList, char *binaryCode)
                     }
                     else if (temp->operandType[i - 1] == DATA_LABEL)
                     {
-
                         addStrToBinaryCode(tempNumToStr, temp->targetLabelAdd[i - 1], 12);
                         strcat(binaryCode, tempNumToStr);
                         memset(tempNumToStr, '\0', sizeof(tempNumToStr));
