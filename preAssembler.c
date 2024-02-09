@@ -179,7 +179,7 @@ dNode getDefineIndex(char *name, int defineCounter, dNode defines)
     dNode temp = defines;
     while (temp != NULL)
     {
-        if (strncmp(temp->name, name, strlen(name)) == 0 && temp->defined == TRUE)
+        if (strcmp(temp->name, name) == 0 && temp->defined == TRUE)
         {
             return temp;
         }
@@ -312,6 +312,8 @@ int replaceDefines(char *text, int lineNum, int *defineCounter, dNode *defines)
                 j = 0;
                 i++;
                 hasSpace = FALSE;
+                tempName[0] = '\0';
+                tempNum[0] = '\0';
             }
         }
         i++;

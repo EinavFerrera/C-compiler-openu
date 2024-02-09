@@ -63,6 +63,7 @@ int fAssembler(char *fileName)
     }
 
     /*checks if type oparnd: both imm/reg = 00, local label = 10 , external label = 01*/
+    printListLoop(labelList);
     addLabelsAddressToCnode(headNode, labelList);
     fclose(inputFile);
     sAssembler(fileName, headNode, labelList, IC + DC, IC, DC);
@@ -533,6 +534,7 @@ void addLabelsAddressToCnode(cNode headNode, lNode labelList)
                 lNode tempLabel = searchListNode(labelList, temp->operandLabel[i], LABEL_TEXT);
                 while (tempLabel != NULL)
                 {
+
                     if (tempLabel->mainType == DECLERATION)
                     {
                         temp->targetLabelAdd[i] = tempLabel->address;
@@ -628,6 +630,7 @@ lNode createLabelsList(cNode orgListHead, lNode newListHead, int *listAttr, int 
                     newListNode->declarationError = 1;
                     newListNode->mainType = DECLERATION;
                     newListNode->type = EXT;
+                    newListNode->address = 0;
                 }
 
                 if (newListNode->name[0] != '\0')
