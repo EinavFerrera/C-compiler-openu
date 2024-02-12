@@ -199,7 +199,7 @@ void validOperandPerCode(cNode node)
     case 1: /* cmp */
         if (node->operandCount != 2)
         {
-            printf("ERROR: In line %d - command 'cmp' should have 2 operands.\n", node->lineNum);
+            printf("Error: In line %d - command 'cmp' should have 2 operands.\n", node->lineNum);
             node->errorCount++;
             return;
         }
@@ -209,7 +209,7 @@ void validOperandPerCode(cNode node)
             node->operandType[0] != DATA_LABEL &&
             node->operandType[0] != REG)
         {
-            printf("ERROR: In line %d - command 'cmp' first operand should be IMM, LABEL, DATA LABEL, or REG.\n", node->lineNum);
+            printf("Error: In line %d - command 'cmp' first operand should be IMM, LABEL, DATA LABEL, or REG.\n", node->lineNum);
             node->errorCount++;
         }
 
@@ -218,7 +218,7 @@ void validOperandPerCode(cNode node)
             node->operandType[1] != DATA_LABEL &&
             node->operandType[1] != REG)
         {
-            printf("ERROR: In line %d - command 'cmp' second operand should be IMM, LABEL, DATA LABEL, or REG.\n", node->lineNum);
+            printf("Error: In line %d - command 'cmp' second operand should be IMM, LABEL, DATA LABEL, or REG.\n", node->lineNum);
             node->errorCount++;
         }
         break;
@@ -228,7 +228,7 @@ void validOperandPerCode(cNode node)
     case 3: /* sub */
         if (node->operandCount != 2)
         {
-            printf("ERROR: In line %d - command 'mov/add/sub' should have 2 operands.\n", node->lineNum);
+            printf("Error: In line %d - command 'mov/add/sub' should have 2 operands.\n", node->lineNum);
             node->errorCount++;
             return;
         }
@@ -239,7 +239,7 @@ void validOperandPerCode(cNode node)
             node->operandType[0] != DATA_LABEL &&
             node->operandType[0] != REG)
         {
-            printf("ERROR: In line %d - command 'mov/add/sub' first operand should be IMM, LABEL, DATA LABEL, or REG.\n", node->lineNum);
+            printf("Error: In line %d - command 'mov/add/sub' first operand should be IMM, LABEL, DATA LABEL, or REG.\n", node->lineNum);
             node->errorCount++;
         }
 
@@ -248,7 +248,7 @@ void validOperandPerCode(cNode node)
             node->operandType[1] != DATA_LABEL &&
             node->operandType[1] != REG)
         {
-            printf("ERROR: In line %d - command 'mov/add/sub' second operand should be LABEL, DATA LABEL, or REG.\n", node->lineNum);
+            printf("Error: In line %d - command 'mov/add/sub' second operand should be LABEL, DATA LABEL, or REG.\n", node->lineNum);
             node->errorCount++;
         }
         break;
@@ -256,7 +256,7 @@ void validOperandPerCode(cNode node)
     case 6: /* lea */
         if (node->operandCount != 2)
         {
-            printf("ERROR: In line %d - command 'lea' should have 2 operands.\n", node->lineNum);
+            printf("Error: In line %d - command 'lea' should have 2 operands.\n", node->lineNum);
             node->errorCount++;
             return;
         }
@@ -265,7 +265,7 @@ void validOperandPerCode(cNode node)
         if (node->operandType[0] != LABEL &&
             node->operandType[0] != DATA_LABEL)
         {
-            printf("ERROR: In line %d - command 'lea' first operand should be LABEL or DATA LABEL.\n", node->lineNum);
+            printf("Error: In line %d - command 'lea' first operand should be LABEL or DATA LABEL.\n", node->lineNum);
             node->errorCount++;
         }
 
@@ -274,7 +274,7 @@ void validOperandPerCode(cNode node)
             node->operandType[1] != DATA_LABEL &&
             node->operandType[1] != REG)
         {
-            printf("ERROR: In line %d - command 'lea' second operand should be LABEL, DATA LABEL, or REG.\n", node->lineNum);
+            printf("Error: In line %d - command 'lea' second operand should be LABEL, DATA LABEL, or REG.\n", node->lineNum);
             node->errorCount++;
         }
         break;
@@ -282,7 +282,7 @@ void validOperandPerCode(cNode node)
     case 12: /* prn */
         if (node->operandCount != 1)
         {
-            printf("ERROR: In line %d - command 'prn' should have 1 operand.\n", node->lineNum);
+            printf("Error: In line %d - command 'prn' should have 1 operand.\n", node->lineNum);
             node->errorCount++;
             return;
         }
@@ -293,7 +293,7 @@ void validOperandPerCode(cNode node)
             node->operandType[0] != DATA_LABEL &&
             node->operandType[0] != REG)
         {
-            printf("ERROR: In line %d - command 'prn' operand should be IMM, LABEL, DATA LABEL, or REG.\n", node->lineNum);
+            printf("Error: In line %d - command 'prn' operand should be IMM, LABEL, DATA LABEL, or REG.\n", node->lineNum);
             node->errorCount++;
         }
         break;
@@ -305,7 +305,7 @@ void validOperandPerCode(cNode node)
     case 11: /* red */
         if (node->operandCount != 1)
         {
-            printf("ERROR: In line %d - command not/clr/inc/dec/red should have 1 operand.\n", node->lineNum);
+            printf("Error: In line %d - command not/clr/inc/dec/red should have 1 operand.\n", node->lineNum);
             node->errorCount++;
             return;
         }
@@ -315,7 +315,7 @@ void validOperandPerCode(cNode node)
             node->operandType[0] != DATA_LABEL &&
             node->operandType[0] != REG)
         {
-            printf("ERROR: In line %d - command not/clr/inc/dec/red operand should be LABEL, DATA LABEL, or REG.\n", node->lineNum);
+            printf("Error: In line %d - command not/clr/inc/dec/red operand should be LABEL, DATA LABEL, or REG.\n", node->lineNum);
             node->errorCount++;
         }
         break;
@@ -325,7 +325,7 @@ void validOperandPerCode(cNode node)
     case 13: /* jsr */
         if (node->operandCount != 1)
         {
-            printf("ERROR: In line %d - command jmp/bne/jsr should have 1 operand.\n", node->lineNum);
+            printf("Error: In line %d - command jmp/bne/jsr should have 1 operand.\n", node->lineNum);
             node->errorCount++;
             return;
         }
@@ -334,7 +334,7 @@ void validOperandPerCode(cNode node)
         if (node->operandType[0] != LABEL &&
             node->operandType[0] != REG)
         {
-            printf("ERROR: In line %d - command jmp/bne/jsr operand should be LABEL or REG.\n", node->lineNum);
+            printf("Error: In line %d - command jmp/bne/jsr operand should be LABEL or REG.\n", node->lineNum);
             node->errorCount++;
         }
         break;
@@ -343,14 +343,14 @@ void validOperandPerCode(cNode node)
     case 15: /* hlt */
         if (node->operandCount != 0)
         {
-            printf("ERROR: In line %d - command rts/hlt should have 0 operands.\n", node->lineNum);
+            printf("Error: In line %d - command rts/hlt should have 0 operands.\n", node->lineNum);
             node->errorCount++;
         }
         break;
 
     default:
         /* Handle cases for opcodes without operands */
-        printf("ERROR: In line %d - opCode '%d' isn't recognized.\n", node->lineNum, node->opCode);
+        printf("Error: In line %d - opCode '%d' isn't recognized.\n", node->lineNum, node->opCode);
         node->errorCount++;
         break;
     }
@@ -443,7 +443,7 @@ int validateLabelList(lNode listHead, cNode headNode)
                     if ((toCompare->lineNumber != temp->lineNumber) &&
                         (toCompare->mainType == DECLERATION))
                     {
-                        printf("ERROR: in line %d - label '%s' has been declared more than once.\n", toCompare->lineNumber, temp->name);
+                        printf("Error: in line %d - label '%s' has been declared more than once.\n", toCompare->lineNumber, temp->name);
                         temp->declarationError = -1;
                         toCompare->declarationError = -1;
                     }
@@ -452,7 +452,7 @@ int validateLabelList(lNode listHead, cNode headNode)
                     {
                         if (toCompare->lineNumber == temp->lineNumber)
                         {
-                            printf("ERROR: in line %d - label '%s' is declared at the same line it is used.\n", toCompare->lineNumber, temp->name);
+                            printf("Error: in line %d - label '%s' is declared at the same line it is used.\n", toCompare->lineNumber, temp->name);
                             temp->declarationError = -1;
                             toCompare->declarationError = -1;
                         }
@@ -467,7 +467,7 @@ int validateLabelList(lNode listHead, cNode headNode)
                     {
                         if (temp->type != DATA_INT && temp->type != DATA_STRING && temp->type != EXT)
                         {
-                            printf("ERROR: in line %d - label '%s' is not a .data or .string label.\n", toCompare->lineNumber, temp->name);
+                            printf("Error: in line %d - label '%s' is not a .data or .string label.\n", toCompare->lineNumber, temp->name);
                             temp->declarationError = -1;
                             toCompare->declarationError = -1;
                         }
@@ -493,7 +493,7 @@ int validateLabelList(lNode listHead, cNode headNode)
                             }
                             else
                             {
-                                printf("ERROR: in line %d - label '%s[%d]' is trying to accsess memory out of label declartion.\n", toCompare->lineNumber, temp->name, dataUse->operandImm[h]);
+                                printf("Error: in line %d - label '%s[%d]' is trying to accsess memory out of label declartion.\n", toCompare->lineNumber, temp->name, dataUse->operandImm[h]);
                                 temp->declarationError = -1;
                                 toCompare->declarationError = -1;
                             }
@@ -512,7 +512,7 @@ int validateLabelList(lNode listHead, cNode headNode)
     {
         if (temp->declarationError < 1)
         {
-            printf("ERROR: in line %d - label '%s' should be declared.\n", temp->lineNumber, temp->name);
+            printf("Error: in line %d - label '%s' should be declared.\n", temp->lineNumber, temp->name);
 
             return FALSE;
         }

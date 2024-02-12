@@ -465,7 +465,7 @@ void insertDataStringNode(cNode *node, char *token)
 	(*node)->dataArray = (int *)malloc(0);
 	if (!isOnlyAlpha(token))
 	{
-		printf("Error: In line %d - only characters are allowed in .string memory allocation. \"%s\" has unvalid character\n", (*node)->lineNum, token);
+		printf("Error: In line %d - only characters are allowed in .string memory allocation. \"%s\" has invalid character\n", (*node)->lineNum, token);
 		(*node)->errorCount++;
 		return;
 	}

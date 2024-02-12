@@ -112,12 +112,12 @@ int processMacro(char *fileName)
                 macroName[strlen(macroName)] = '\0';
                 if (savedWord(macroName))
                 {
-                    printf("ERROR: Macro name cannot be a saved word in the line: %s", line);
+                    printf("Error: Macro name cannot be a saved word in the line: %s", line);
                     return TRUE;
                 }
                 if (hasSpacesInWord(macroName))
                 {
-                    printf("ERROR: Macro name cannot contain more than one label in the line: %s", line);
+                    printf("Error: Macro name cannot contain more than one label in the line: %s", line);
                     return TRUE;
                 }
                 clearAllBlanks(macroName);
@@ -210,7 +210,7 @@ int replaceDefines(char *text, int lineNum, int *defineCounter, dNode *defines)
             {
                 if (text[i] < 97 || text[i] > 122)
                 {
-                    printf("ERROR: In line %d - Define has no valid define label in line : %s", lineNum, text);
+                    printf("Error: In line %d - Define has no valid define label in line : %s", lineNum, text);
                     return TRUE;
                 }
                 name[j] = text[i];
@@ -220,7 +220,7 @@ int replaceDefines(char *text, int lineNum, int *defineCounter, dNode *defines)
             name[j] = '\0';
             if (text[i] == '\0')
             {
-                printf("ERROR: In line %d - Define has no valid define label in line: %s", lineNum, text);
+                printf("Error: In line %d - Define has no valid define label in line: %s", lineNum, text);
                 return TRUE;
             }
             if (text[i] == ' ')
@@ -243,17 +243,17 @@ int replaceDefines(char *text, int lineNum, int *defineCounter, dNode *defines)
                 textNum[p] = '\0';
                 if (savedWord(textNum))
                 {
-                    printf("ERROR: In line %d - Define cannot be a saved word in the line: %s", lineNum, text);
+                    printf("Error: In line %d - Define cannot be a saved word in the line: %s", lineNum, text);
                     return TRUE;
                 }
                 if (!isOnlyDigit(textNum))
                 {
-                    printf("ERROR: In line %d - Define value is not a number in line: %s", lineNum, text);
+                    printf("Error: In line %d - Define value is not a number in line: %s", lineNum, text);
                     return TRUE;
                 }
                 if (getDefineIndex(name, *defineCounter, *defines) != NULL)
                 {
-                    printf("ERROR: In line %d - Define label already exists", lineNum);
+                    printf("Error: In line %d - Define label already exists", lineNum);
                     return TRUE;
                 }
                 else
@@ -270,7 +270,7 @@ int replaceDefines(char *text, int lineNum, int *defineCounter, dNode *defines)
             }
             else
             {
-                printf("ERROR: In line %d - Define decleration does not contain number in line: %s", lineNum, text);
+                printf("Error: In line %d - Define decleration does not contain number in line: %s", lineNum, text);
                 return TRUE;
             }
         }
