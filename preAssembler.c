@@ -44,7 +44,7 @@ int preAssembel(char *fileName)
     while (fgets(line, sizeof(line), asFile))
     {
         removeCarrigeReturn(line);
-        if (removeCommentsAndSpaces(line)) /*if comments return 1, or replace line with single space only*/
+        if (removeCommentsAndSpaces(line)) /*if comment return 1, or replace line with single space only*/
         {
             continue;
         }
@@ -200,7 +200,6 @@ int replaceDefines(char *text, int lineNum, int *defineCounter, dNode *defines)
     char tempName[MAX_LABEL_SIZE];
     char tempNum[MAX_LINE_SIZE];
     int hasSpace = FALSE;
-
     while (text[i] != '\0')
     {
         if (i == 0 && length > 8 && strncmp(&text[i], ".define", 7) == 0 && text[i + 7] == ' ')
@@ -234,14 +233,15 @@ int replaceDefines(char *text, int lineNum, int *defineCounter, dNode *defines)
                 {
                     i++;
                 }
-                while (text[i] != '\0' && text[i] != '\n')
+                while (text[i] != '\0' && text[i] != '\n' && text[i] != '\r' && text[i] != ' ' && text[i] != '\t')
                 {
                     textNum[p] = text[i];
                     p++;
                     i++;
                 }
                 textNum[p] = '\0';
-                if (savedWord(textNum))
+
+                if (savedWord(name))
                 {
                     printf("Error: In line %d - Define cannot be a saved word in the line: %s", lineNum, text);
                     return TRUE;
@@ -254,6 +254,17 @@ int replaceDefines(char *text, int lineNum, int *defineCounter, dNode *defines)
                 if (getDefineIndex(name, *defineCounter, *defines) != NULL)
                 {
                     printf("Error: In line %d - Define label already exists", lineNum);
+                    return TRUE;
+                }
+
+                while (text[i] == ' ' || text[i] == '\t')
+                {
+                    i++;
+                }
+
+                if (text[i] != '\0' && text[i] != '\n' && text[i] != '\r')
+                {
+                    printf("Error: In line %d - Define decleration contains more than one number in line: %s", lineNum, text);
                     return TRUE;
                 }
                 else
@@ -296,7 +307,8 @@ int replaceDefines(char *text, int lineNum, int *defineCounter, dNode *defines)
                     i++;
                     j++;
                 }
-                if (text[i] == ' ' ||
+                if (text[i] == ' ' || text[i] == ',' || text[i] == '\n' || text[i] == 't' ||
+                    text[i] == '\0' ||
                     (text[i] == ']' && text[i - j - 1] == '['))
                 {
                     hasSpace = TRUE;
@@ -306,8 +318,10 @@ int replaceDefines(char *text, int lineNum, int *defineCounter, dNode *defines)
                 if (defineNode != NULL && hasSpace)
                 {
                     sprintf(tempNum, "%d", defineNode->value);
+                    j = strlen(tempNum); /*save the length f the new number*/
                     strncat(tempNum, &text[i], strlen(&text[i] - 1));
                     memmove(&text[i - strlen(tempName)], &tempNum, strlen(tempNum) + 1);
+                    i = i - strlen(tempName) + j;
                 }
                 j = 0;
                 i++;
