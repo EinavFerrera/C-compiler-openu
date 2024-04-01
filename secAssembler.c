@@ -114,12 +114,21 @@ int nodesToBinary(cNode headNode, lNode labelList, char *binaryCode)
                         memset(tempNumToStr, '\0', sizeof(tempNumToStr));
                         strcat(binaryCode, "00\n");
                     }
+                    else if (temp->operandType[i - 1] == REG && temp->operandCount == 1 && i == 1)
+                    {
+                        strcat(binaryCode, "000000000");
+                        addStrToBinaryCode(tempNumToStr, temp->operandReg[0], 3);
+                        strcat(binaryCode, tempNumToStr);
+                        memset(tempNumToStr, '\0', sizeof(tempNumToStr));
+                        strcat(binaryCode, "00\n");
+                    }
                     else if (temp->operandType[i - 1] == REG)
                     {
                         if (i == 1)
                         {
                             strcat(binaryCode, "000000");
                             addStrToBinaryCode(tempNumToStr, temp->operandReg[0], 3);
+
                             strcat(binaryCode, tempNumToStr);
                             memset(tempNumToStr, '\0', sizeof(tempNumToStr));
                             strcat(binaryCode, "00000\n");
@@ -127,7 +136,8 @@ int nodesToBinary(cNode headNode, lNode labelList, char *binaryCode)
                         else if (i == 2)
                         {
                             strcat(binaryCode, "000000000");
-                            addStrToBinaryCode(tempNumToStr, temp->operandReg[0], 3);
+
+                            addStrToBinaryCode(tempNumToStr, temp->operandReg[1], 3);
                             strcat(binaryCode, tempNumToStr);
                             memset(tempNumToStr, '\0', sizeof(tempNumToStr));
                             strcat(binaryCode, "00\n");
