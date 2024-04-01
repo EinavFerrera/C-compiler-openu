@@ -1,0 +1,17 @@
+
+			************ Pre Assembler finished successfully for file "tests/test4/test4"! Am file has been created ************
+Error: In line 1 - "rut" is not a valid label or command
+Error: In line 2 - "rut" is not a valid label or command
+Error: In line 3 - "rut" is not a valid label or command
+Error: In line 4 - "rut" is not a valid label or command
+Error: In line 5 - "ptras:6" is not a valid label or command
+Error: In line 6 - "ST" is not a valid label or command
+Error: In line 7 - "123" is not a valid label or command
+Error: In line 8 - "456" is not a valid label or command
+Error: In line 9 - "123" is not a valid label or command
+Error: In line 10 - "456" is not a valid label or command
+Error: In line 11 - "4765" is not a valid label or command
+Error: In line 12 - "789" is not a valid label or command
+Error: In line 13 - "789" is not a valid label or command
+
+			************ Compiling Stopped ! There are errors in the file "tests/test4/test4"! ************ 

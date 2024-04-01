@@ -1,0 +1,26 @@
+
+			************ Pre Assembler finished successfully for file "tests/error1/error1"! Am file has been created ************
+Error: In line 13 - blank charachters are no an valid label command
+Error: In line 13 - command 'mov/add/sub' should have 2 operands.
+Error: In line 15 - too many commas in the line
+Error: In line 16 - too many commas in the line
+18 _ # -5_
+Error: In line 18 - " # -5" is not a valid label, a comma may have been missing
+Error: In line 18 - command 'mov/add/sub' should have 2 operands.
+Error: In line 20 - only characters are allowed in .string memory allocation. "abc$ef" has invalid character
+Error: In line 21 - only characters are allowed in .string memory allocation. "ghi^jk" has invalid character
+Error: In line 23 - command 'mov/add/sub' should have 2 operands.
+Error: In line 27 - "#1234" is not a valid label or command
+Error: In line 29 - "FLOATLABEL" is not a valid label or command
+Error: In line 31 - numbers shold be seperated with a comma. " .string "hello"" is not a valid number
+Error: In line 31 - only numbers are allowed in .data memory allocation. ".string"hello"" is not a valid number
+Error: In line 33 - command not/clr/inc/dec/red should have 1 operand.
+Error: In line 38 - "nopq"" is not a valid label or command
+Error: In line 46 - "undefaction" is not a valid label or command
+Error: In line 50 - only numbers are allowed in .data memory allocation. "5.5" is not a valid number
+Error: In line 52 - "@r1" is not a valid label or command
+Error: In line 52 - command not/clr/inc/dec/red should have 1 operand.
+Error: In line 53 - "@r2" is not a valid label or command
+Error: In line 53 - command not/clr/inc/dec/red should have 1 operand.
+
+			************ Compiling Stopped ! There are errors in the file "tests/error1/error1"! ************ 

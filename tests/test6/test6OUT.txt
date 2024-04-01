@@ -1,0 +1,5 @@
+
+			************ Pre Assembler finished successfully for file "tests/test6/test6"! Am file has been created ************
+
+			************ File "tests/test6/test6" compiled successfully! ************ 
+

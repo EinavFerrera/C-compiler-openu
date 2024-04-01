@@ -1,0 +1,6 @@
+
+			************ Pre Assembler finished successfully for file "tests/test2/test2"! Am file has been created ************
+Error: In line 24 - too many commas.
+Error: In line 24 - command 'mov/add/sub' should have 2 operands.
+
+			************ Compiling Stopped ! There are errors in the file "tests/test2/test2"! ************ 

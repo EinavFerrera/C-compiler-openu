@@ -1,0 +1,9 @@
+
+			************ Pre Assembler finished successfully for file "tests/test5/test5"! Am file has been created ************
+
+			************ ent file was created successfully ************
+
+			************ extern Label created successfully ************
+
+			************ File "tests/test5/test5" compiled successfully! ************ 
+
