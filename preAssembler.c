@@ -336,10 +336,18 @@ int replaceDefines(char *text, int lineNum, int *defineCounter, dNode *defines)
 }
 int removeCommentsAndSpaces(char *line)
 {
+    int i = 0;
     char newLine[MAX_LINE_SIZE] = {'\0'};
     if (line[0] == ';')
     {
         return TRUE;
+    }
+    for (i = 7; i < strlen(line); i++)
+    {
+        if (strncmp(&line[i - 7], ".string", 7) == 0)
+        {
+            return FALSE;
+        }
     }
     clearDuplicateBlankChars(line, newLine);
     memset(line, 0, MAX_LINE_SIZE);

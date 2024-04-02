@@ -6,7 +6,7 @@ gae: hlt
 sub #1, r1 
 cmp #123,bnana
 YOYO: .string "BBCasd"
-BABA143: .string "ABC as t"
+BABA143: .string "ABC as    t"
 g: .data 5 , -2046 , +987
 .extern bnana
 lae: cmp #123, EXTERE[2] 
