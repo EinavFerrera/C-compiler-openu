@@ -88,7 +88,7 @@ prn #1111
 
 lea LOOP , r7
 END: hlt
-STR: .string "abcdef"
+STR:	.string "abcdef"
 LIST: .data 6,-9, 4
 LIST1: .data 4, 4,4, 2
 LIST2: .data 6,-9, 4
